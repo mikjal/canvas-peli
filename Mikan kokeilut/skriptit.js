@@ -3,7 +3,7 @@ img.src = './flatboy-walk2.png'
 
 const painovoima = 1;
 
-let canvas, ctx, check = 0, draw = true, pelaaja;
+let canvas, ctx, check = 0, draw = true, pelaaja, aika;
 
 const hyppynappi = {
     painettu: false
@@ -65,6 +65,8 @@ function debug() {
     let lakipiste = (pelaaja.lakipisteSaavutettu == false) ? 'Ei' : 'Kyllä';
     document.querySelector('#lakipiste').innerText = lakipiste;
     document.querySelector('#xnopeus').innerText = pelaaja.nopeus.x;
+    document.querySelector('#ftime').innerText = Date.now() - aika;
+    aika = Date.now();
 }
 
 window.onload = () => {
