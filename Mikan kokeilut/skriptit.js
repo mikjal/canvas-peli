@@ -1,5 +1,5 @@
 const img = new Image;
-img.src = './flatboy-sprites.png'
+img.src = './flatboy-walk2.png'
 
 const painovoima = 1;
 
@@ -13,7 +13,7 @@ const hyppynappi = {
 
 class Pelaaja {
     constructor() {
-        this.animFrameja = 15;
+        this.animFrameja = img.width / 307;
         this.nykyinenFrame = 0;
         this.leveys = img.width / this.animFrameja;
         this.korkeus = img.height;
@@ -39,7 +39,7 @@ class Pelaaja {
             this.paikka.y, /* destination y */
             this.leveys,
             this.korkeus);
-        this.nykyinenFrame = (this.nykyinenFrame < 14) ? this.nykyinenFrame += 1 : 0;
+        this.nykyinenFrame = (this.nykyinenFrame < this.animFrameja-1) ? this.nykyinenFrame += 1 : 0;
     }
 
     paivita() {
@@ -64,6 +64,7 @@ function debug() {
     document.querySelector('#ynopeus').innerText = pelaaja.nopeus.y;
     let lakipiste = (pelaaja.lakipisteSaavutettu == false) ? 'Ei' : 'Kyllä';
     document.querySelector('#lakipiste').innerText = lakipiste;
+    document.querySelector('#xnopeus').innerText = pelaaja.nopeus.x;
 }
 
 window.onload = () => {
@@ -71,6 +72,8 @@ window.onload = () => {
     ctx = canvas.getContext("2d");
 
     pelaaja = new Pelaaja();
+    /* kävelynopeus */
+    pelaaja.nopeus.x = 2;
     animoi();
 
     window.addEventListener('keydown', (eve) => {
