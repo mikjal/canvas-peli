@@ -1,14 +1,20 @@
 const img = new Image;
-img.src = './kissa-kavelee.png'
+img.src = './kissa-kavelee.png';
+
+
+const aitaImg = new Image;
+aitaImg.src = 'aita-80.png';
+
 
 const painovoima = 1;
 
-let canvas, ctx, check = 0, draw = true, pelaaja;
+let canvas, ctx, check = 0, draw = true, pelaaja, aita;
+
+
 
 const hyppynappi = {
     painettu: false
-}
-
+};
 /* 307 x 251  */
 
 class Pelaaja {
@@ -20,11 +26,11 @@ class Pelaaja {
         this.paikka = {
             x: canvas.width / 3 - this.leveys / 2,
             y: canvas.height - this.korkeus
-        }
+        };
         this.nopeus = {
             x: 0,
             y: 0
-        }
+        };
         this.voiHypata = true
         this.lakipisteSaavutettu = false
     }
@@ -55,7 +61,31 @@ class Pelaaja {
             this.voiHypata = true;
             this.lakipisteSaavutettu = false;
         }
-        
+    }
+}
+
+class Aita {
+    constructor(x, korkeus, leveys, nopeus) {
+        this.x = x;
+        this.korkeus = korkeus;
+        this.leveys = leveys;
+        this.nopeus = nopeus;
+    }
+
+    piirra() {
+        ctx.drawImage(
+            aitaImg, this.x,
+            canvas.height - this.korkeus,
+            this.leveys, this.korkeus
+        );
+    }
+
+    liiku() {
+        this.x += this.nopeus;
+
+        if (this.x > canvas.width) {
+            this.x = -this.leveys; // Asetetaan aita takaisin näytön alkuun
+        }
     }
 }
 
@@ -65,23 +95,6 @@ function debug() {
     let lakipiste = (pelaaja.lakipisteSaavutettu == false) ? 'Ei' : 'Kyllä';
     document.querySelector('#lakipiste').innerText = lakipiste;
 }
-
-window.onload = () => {
-    canvas = document.querySelector('#kanvas');
-    ctx = canvas.getContext("2d");
-
-    pelaaja = new Pelaaja();
-    animoi();
-
-    window.addEventListener('keydown', (eve) => {
-        if (eve.key == 'ArrowUp' || eve.code == 'ArrowUp') {
-            /* vain yksi hyppy kerralla, ei voi tehdä toista hyppyä kun edellinen hyppy on menossa */
-            if (pelaaja.voiHypata) pelaaja.nopeus.y = -15;
-        }
-    })
-
-}
-
 
 /*function animoi() {
     window.requestAnimationFrame(animoi);
@@ -96,13 +109,16 @@ window.onload = () => {
     //} else draw = true; /* piirrä seuraavalla kerralla */
 //}
 
+
 function animoi() {
     if (draw) { 
         // piirretään vain joka toinen kerta
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         pelaaja.paivita();
-    } 
+        aita.liiku();
+        aita.piirra();
 
+    }
     // vaihdetaan seuraavalla kierroksella
     draw = !draw;
 
@@ -122,7 +138,9 @@ window.onload = () => {
     ctx = canvas.getContext("2d");
 
     pelaaja = new Pelaaja();
+    aita = new Aita(0, 100, 150, 2);
     animoi();
+
 
     window.addEventListener('keydown', (eve) => {
         if (eve.key == 'ArrowUp' || eve.code == 'ArrowUp') {
