@@ -1,15 +1,22 @@
 const img = new Image;
 img.src = './flatboy-walk2.png'
+/* 307 x 251  */
+
+const aitaimg = new Image;
+aitaimg.src = 'aita-80.png';
+/* 142 x 80 */
 
 const painovoima = 1;
 
-let canvas, ctx, check = 0, draw = true, pelaaja, aika;
+let canvas, ctx, check = 0, draw = true, pelaaja, aika
+/* let aita; */
+let aidat = [];
 
 const hyppynappi = {
     painettu: false
 }
 
-/* 307 x 251  */
+
 
 class Pelaaja {
     constructor() {
@@ -59,13 +66,44 @@ class Pelaaja {
     }
 }
 
+class Aita {
+    constructor(x) {
+        this.paikka = {
+            x: x,
+            y: canvas.height - aitaimg.height -4
+        }
+        this.pituus = aitaimg.width;
+        this.korkeus = aitaimg.height;
+    }
+
+    piirra() {
+        /*
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(this.paikka.x, this.paikka.y, this.pituus, this.korkeus);
+        */
+       /*
+        ctx.drawImage(aitaimg,
+            0,
+            0,
+            aitaimg.width,
+            aitaimg.height,
+            this.paikka.x,
+            this.paikka.y,
+            this.pituus,
+            this.korkeus); 
+        */
+       ctx.drawImage(aitaimg,this.paikka.x, this.paikka.y);
+    }
+}
+
 function debug() {
     document.querySelector('#ypaikka').innerText = pelaaja.paikka.y;
     document.querySelector('#ynopeus').innerText = pelaaja.nopeus.y;
     let lakipiste = (pelaaja.lakipisteSaavutettu == false) ? 'Ei' : 'Kyllä';
     document.querySelector('#lakipiste').innerText = lakipiste;
+    document.querySelector('#xpaikka').innerText = pelaaja.paikka.x;
     document.querySelector('#xnopeus').innerText = pelaaja.nopeus.x;
-    document.querySelector('#ftime').innerText = Date.now() - aika;
+    document.querySelector('#ftime').innerText = Math.ceil(1000 / (Date.now() - aika));
     aika = Date.now();
 }
 
@@ -74,7 +112,15 @@ window.onload = () => {
     ctx = canvas.getContext("2d");
 
     pelaaja = new Pelaaja();
-    /* kävelynopeus */
+    /*
+    aidat = [new Aita(1000), new Aita(1000+139)]
+    */
+
+    for (let i=0;i<10;i++) {
+        aidat.push(new Aita(1200+i*139))
+    }
+
+    /* kävelynopeus = 2 */
     pelaaja.nopeus.x = 2;
     animoi();
 
@@ -94,8 +140,15 @@ function animoi() {
         /* tyhjennä tausta */
         ctx.fillStyle = '#aaaaaa';
         ctx.fillRect(0,0,canvas.width,canvas.height)
-        /* piirrä pelaaja */
+ 
+        aidat.forEach(aita => {
+            aita.piirra();
+            aita.paikka.x -= pelaaja.nopeus.x;
+        });
+        /* aita.piirra(); */
+       /* piirrä pelaaja */
         pelaaja.paivita();
+
         /* seuraavalla "kierroksella" ei piirretä */
         draw = false;
     } else draw = true; /* piirrä seuraavalla kerralla */
