@@ -1,0 +1,13 @@
+body {
+    margin: 0;
+}
+
+#kanvaasi {
+    display: block;
+    margin: auto;
+}
+/* Terttu lisännyt tautakuvaa varten */
+#kanvas {
+    background-image: url('maisema2.png'); /* Käytä oikeaa tiedostonimeä */
+    background-size: cover;
+}
