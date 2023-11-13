@@ -8,6 +8,6 @@ body {
 }
 /* Terttu lisännyt tautakuvaa varten */
 #kanvas {
-    background-image: url('tausta.png'); /* Käytä oikeaa tiedostonimeä */
+    background-image: url('taustaLinnut.png'); /* Käytä oikeaa tiedostonimeä */
     background-size: cover;
 }

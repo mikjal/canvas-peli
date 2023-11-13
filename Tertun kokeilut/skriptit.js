@@ -70,24 +70,45 @@ class Aita {
         this.korkeus = korkeus;
         this.leveys = leveys;
         this.nopeus = nopeus;
+
+        this.aidat = [];
+        this.luoAita();
     }
 
+    luoAita() {
+        let x = this.x;
+
+        while (x < canvas.width) {
+            this.aidat.push({ x: x, korkeus:70});
+            x += this.leveys;
+        }
+    }
+    
     piirra() {
-        ctx.drawImage(
-            aitaImg, this.x,
-            canvas.height - this.korkeus,
-            this.leveys, this.korkeus
-        );
+        for (let i = 0; i < this.aidat.length; i++) {
+            ctx.drawImage(aitaImg, this.aidat[i].x, canvas.height - this.aidat[i].korkeus, this.leveys, this.aidat[i].korkeus);
+        }
     }
 
     liiku() {
-        this.x += this.nopeus;
-
-        if (this.x > canvas.width) {
-            this.x = -this.leveys; // Asetetaan aita takaisin näytön alkuun
+        // Siirrä kaikkia aitaelementtejä
+        for (let i = 0; i < this.aidat.length; i++) {
+            this.aidat[i].x -= this.nopeus;
         }
+    
+        // Tarkista, onko ensimmäinen aitaelementti kokonaan näytön vasemman reunan ulkopuolella
+        if (this.aidat.length > 0 && this.aidat[0].x + this.leveys <= 0) {
+            // Poista ensimmäinen aitaelementti
+            this.aidat.shift();
+        }
+    
+        // Lisää uusi aitaelementti näytön oikeaan reunaan
+        this.aidat.push({
+            x: this.aidat[this.aidat.length - 1].x + this.leveys,
+            korkeus: Math.random() * (canvas.height / 4) + 100
+        });
     }
-}
+}    
 
 function debug() {
     document.querySelector('#ypaikka').innerText = pelaaja.paikka.y;
@@ -114,11 +135,12 @@ function animoi() {
     if (draw) { 
         // piirretään vain joka toinen kerta
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pelaaja.paivita();
+        
         aita.liiku();
         aita.piirra();
-
+        pelaaja.paivita();
     }
+
     // vaihdetaan seuraavalla kierroksella
     draw = !draw;
 
@@ -147,4 +169,5 @@ window.onload = () => {
             if (pelaaja.voiHypata) pelaaja.nopeus.y = -15;
         }
     });
+
 };
