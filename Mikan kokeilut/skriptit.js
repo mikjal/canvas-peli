@@ -8,7 +8,9 @@ aitaimg.src = 'aita-80.png';
 
 const painovoima = 1;
 
-let canvas, ctx, check = 0, draw = true, pelaaja, aika
+let canvas, ctx, check = 0, draw = true, pelaaja, aika;
+let debug = false;
+
 /* let aita; */
 let aidat = [];
 
@@ -16,17 +18,16 @@ const hyppynappi = {
     painettu: false
 }
 
-
-
 class Pelaaja {
     constructor() {
         this.animFrameja = img.width / 307;
         this.nykyinenFrame = 0;
         this.leveys = img.width / this.animFrameja;
         this.korkeus = img.height;
+        this.yOffset = 15
         this.paikka = {
             x: canvas.width / 2 - this.leveys / 2,
-            y: canvas.height - this.korkeus
+            y: canvas.height - this.korkeus - this.yOffset
         }
         this.nopeus = {
             x: 0,
@@ -51,9 +52,18 @@ class Pelaaja {
 
     paivita() {
         this.piirra();
-        debug();
+        if (debug) {
+            if (document.querySelector('#debugger').style.display == 'none') {
+                document.querySelector('#debugger').style.display = 'block';
+            }
+            debuggaus();
+        } else {
+            if (document.querySelector('#debugger').style.display == 'block') {
+                document.querySelector('#debugger').style.display = 'none';
+            }
+        }
         this.paikka.y += this.nopeus.y;
-        if (this.paikka.y + this.korkeus + this.nopeus.y < canvas.height) {
+        if (this.paikka.y + this.korkeus + this.nopeus.y < canvas.height - this.yOffset) {
             if (this.nopeus.y < 0 && this.nopeus.y + painovoima >= 0) this.lakipisteSaavutettu = true;
             this.nopeus.y += painovoima;
             this.voiHypata = false;
@@ -68,9 +78,10 @@ class Pelaaja {
 
 class Aita {
     constructor(x) {
+        this.yOffset = 24;
         this.paikka = {
             x: x,
-            y: canvas.height - aitaimg.height -4
+            y: canvas.height - aitaimg.height - this.yOffset
         }
         this.pituus = aitaimg.width;
         this.korkeus = aitaimg.height;
@@ -96,7 +107,7 @@ class Aita {
     }
 }
 
-function debug() {
+function debuggaus() {
     document.querySelector('#ypaikka').innerText = pelaaja.paikka.y;
     document.querySelector('#ynopeus').innerText = pelaaja.nopeus.y;
     let lakipiste = (pelaaja.lakipisteSaavutettu == false) ? 'Ei' : 'Kyllä';
@@ -124,6 +135,8 @@ window.onload = () => {
     pelaaja.nopeus.x = 2;
     animoi();
 
+
+
     window.addEventListener('keydown', (eve) => {
         if (eve.key == 'ArrowUp' || eve.code == 'ArrowUp') {
             /* vain yksi hyppy kerralla, ei voi tehdä toista hyppyä kun edellinen hyppy on menossa */
@@ -138,16 +151,29 @@ function animoi() {
     window.requestAnimationFrame(animoi);
     if (draw) { /* piirretään vain joka toinen kerta */
         /* tyhjennä tausta */
+        /*
         ctx.fillStyle = '#aaaaaa';
         ctx.fillRect(0,0,canvas.width,canvas.height)
- 
+        */
+
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        const radi = ctx.createLinearGradient(0,canvas.height-50,0,canvas.height);
+        radi.addColorStop(0,'#e5a029'); /* #e5a029 */
+        radi.addColorStop(1,'#e9aa45'); /* #e9aa45 */ /* #f3ce97 */
+        ctx.fillStyle = radi;
+        ctx.fillRect(0,canvas.height-50,canvas.width,50);
+
         aidat.forEach(aita => {
             aita.piirra();
             aita.paikka.x -= pelaaja.nopeus.x;
         });
+ 
         /* aita.piirra(); */
        /* piirrä pelaaja */
         pelaaja.paivita();
+
+ 
 
         /* seuraavalla "kierroksella" ei piirretä */
         draw = false;
