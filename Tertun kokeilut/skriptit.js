@@ -3,7 +3,7 @@ img.src = './kissa-kavelee.png';
 
 
 const aitaImg = new Image;
-aitaImg.src = 'aita-80.png';
+aitaImg.src = 'tiiliaita3.png';
 
 
 const painovoima = 1;
@@ -79,11 +79,11 @@ class Aita {
         let x = this.x;
 
         while (x < canvas.width) {
-            this.aidat.push({ x: x, korkeus:70});
+            this.aidat.push({ x: x, korkeus:170});
             x += this.leveys;
         }
     }
-    
+
     piirra() {
         for (let i = 0; i < this.aidat.length; i++) {
             ctx.drawImage(aitaImg, this.aidat[i].x, canvas.height - this.aidat[i].korkeus, this.leveys, this.aidat[i].korkeus);
