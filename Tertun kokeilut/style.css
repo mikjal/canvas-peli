@@ -7,7 +7,9 @@ body {
     margin: auto;
 }
 /* Terttu lisännyt tautakuvaa varten */
-/*#kanvas {
-    background-image: url('taustaLinnut.png'); /* Käytä oikeaa tiedostonimeä */
-  /*  background-size: cover;
+#kanvas {
+    background-color: aqua;
+    background-image: url('kerros0-1024x288AurinkoPilvet.png'); /* Käytä oikeaa tiedostonimeä */
+    background-size: cover;
+    
 }
