@@ -199,7 +199,7 @@ class Puu_rivi {
 class Tausta {
     constructor() {
         this.img = new Image();
-        this.img.src = 'taustaLinnut.png'; // Korvaa tämä taustakuvan polulla
+        this.img.src = 'taustaLinnut3.png'; // Korvaa tämä taustakuvan polulla
         this.x = 0;
         this.y = 0;
         this.nopeus = 2; // Säädä nopeutta tarpeen mukaan
