@@ -7,7 +7,7 @@ body {
     margin: auto;
 }
 /* Terttu lisännyt tautakuvaa varten */
-#kanvas {
+/*#kanvas {
     background-image: url('taustaLinnut.png'); /* Käytä oikeaa tiedostonimeä */
-    background-size: cover;
+  /*  background-size: cover;
 }

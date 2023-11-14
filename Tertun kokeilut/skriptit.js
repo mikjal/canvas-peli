@@ -7,9 +7,12 @@ aitaImg.src = 'tiiliaita3.png';
 const puuImg = new Image();
 puuImg.src = 'puut.png';
 
+const lintuImg = new Image();
+lintuImg.src = 'linnunlento3.png';
+
 const painovoima = 1;
 
-let canvas, ctx, check = 0, draw = true, pelaaja, aita, puu;
+let canvas, ctx, check = 0, draw = true, pelaaja, aita, puu, lintu, puu2, tausta;
 
 const hyppynappi = {
     painettu: false
@@ -63,6 +66,50 @@ class Pelaaja {
     }
 }
 
+class Lintu {
+    constructor() {
+        this.animFrameja = 27; // Vaihda tason määrä
+        this.nykyinenFrame = 0;
+        this.leveys = lintuImg.width / this.animFrameja;
+        this.korkeus = 550; // Pienennetty korkeus
+        this.paikka = {
+            x: 0,  // Aseta linnun alku sivun vasempaan reunaan
+            y: canvas.height - this.korkeus
+        };
+        this.nopeus = {
+            x: 20,  // Aseta linnun vaakasuuntainen nopeus
+            y: 0
+        };
+    }
+
+    piirra() {
+        ctx.drawImage(lintuImg,
+            this.nykyinenFrame * this.leveys, /* source x */
+            0, /* source y */
+            this.leveys,
+            this.korkeus,
+            this.paikka.x, /* destination x */
+            this.paikka.y, /* destination y */
+            this.leveys,
+            this.korkeus);
+        this.nykyinenFrame = (this.nykyinenFrame < this.animFrameja - 1) ? this.nykyinenFrame += 1 : 0;
+    }
+
+    liiku() {
+        // Vaakasuuntainen liike
+        this.paikka.x += this.nopeus.x;
+
+        // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
+        if (this.paikka.x + this.leveys > canvas.width) {
+            this.paikka.x = 0;
+        }
+    }
+
+    paivita() {
+        this.piirra();
+        this.liiku();
+    }
+}
 class Aita {
     constructor(x, korkeus, leveys, nopeus) {
         this.x = x;
@@ -128,6 +175,49 @@ class Puu {
     }
 }
 
+class Puu_rivi {
+    constructor() {
+        this.img = new Image();
+        this.img.src = 'puut.png'; // Korvaa tämä puun kuvatiedoston polulla
+        this.korkeus = 300; // Pienennetty korkeus
+        this.leveys = 700; // Pienennetty leveys
+        this.x = canvas.width;
+        this.y = canvas.height - this.korkeus - 20; // Aseta ylemmäs
+    }
+
+    liiku() {
+        this.x -= 2; // Tämä on esimerkki, muuta tarpeen mukaan
+        if (this.x + this.leveys <= 0) {
+            this.x = canvas.width; // Asetetaan takaisin näytön oikeaan reunaan
+        }
+    }
+
+    piirra() {
+        ctx.drawImage(this.img, this.x, this.y -100, this.leveys, this.korkeus);
+    }
+}
+class Tausta {
+    constructor() {
+        this.img = new Image();
+        this.img.src = 'taustaLinnut.png'; // Korvaa tämä taustakuvan polulla
+        this.x = 0;
+        this.y = 0;
+        this.nopeus = 2; // Säädä nopeutta tarpeen mukaan
+    }
+
+    liiku() {
+        this.x -= this.nopeus;
+        if (this.x <= -canvas.width) {
+            this.x = 0;
+        }
+    }
+
+    piirra() {
+        ctx.drawImage(this.img, this.x, this.y, canvas.width, canvas.height);
+        ctx.drawImage(this.img, this.x + canvas.width, this.y, canvas.width, canvas.height);
+    }
+}
+
 function debug() {
     document.querySelector('#ypaikka').innerText = pelaaja.paikka.y;
     document.querySelector('#ynopeus').innerText = pelaaja.nopeus.y;
@@ -139,7 +229,13 @@ function animoi() {
     if (draw) { 
         // piirretään vain joka toinen kerta
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(puuImg, 0, 150, canvas.width, canvas.height - img.height);
+        tausta.liiku();
+        tausta.piirra();
+        lintu.liiku();
+        lintu.piirra();
+        //ctx.drawImage(puuImg, 0, 150, canvas.width, canvas.height - img.height);
+        puu2.liiku();
+        puu2.piirra();
         puu.liiku(); // Liikuta puuta ennen sen piirtämistä
         puu.piirra();
         aita.liiku();
@@ -165,11 +261,12 @@ function animoi() {
 window.onload = () => {
     canvas = document.querySelector('#kanvas');
     ctx = canvas.getContext("2d");
-    // Lisää tämä window.onloadin sisälle
-    
+    tausta = new Tausta();
     pelaaja = new Pelaaja();
     aita = new Aita(0, 80, 150, 2);
     puu = new Puu(); // Tässä luodaan puu
+    puu2 = new Puu_rivi();
+    lintu = new Lintu();
     animoi();
 
     window.addEventListener('keydown', (eve) => {
