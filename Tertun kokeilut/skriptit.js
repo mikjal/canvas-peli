@@ -8,7 +8,7 @@ const puuImg = new Image();
 puuImg.src = 'puut.png';
 
 const lintuImg = new Image();
-lintuImg.src = 'linnunlento3.png';
+lintuImg.src = 'linnunlento.png';
 
 const painovoima = 1;
 
