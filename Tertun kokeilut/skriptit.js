@@ -8,7 +8,7 @@ const puuImg = new Image();
 puuImg.src = 'puut.png';
 
 const lintuImg = new Image();
-lintuImg.src = 'linnunlento.png';
+lintuImg.src = 'linnunlento15.png';
 
 const painovoima = 1;
 
@@ -68,12 +68,12 @@ class Pelaaja {
 
 class Lintu {
     constructor() {
-        this.animFrameja = 27; // Vaihda tason määrä
+        this.animFrameja = 15; // Vaihda tason määrä
         this.nykyinenFrame = 0;
         this.leveys = lintuImg.width / this.animFrameja;
         this.korkeus = 550; // Pienennetty korkeus
         this.paikka = {
-            x: 0,  // Aseta linnun alku sivun vasempaan reunaan
+            x: -170,  // Aseta linnun alku sivun vasempaan reunaan
             y: canvas.height - this.korkeus
         };
         this.nopeus = {
@@ -100,7 +100,7 @@ class Lintu {
         this.paikka.x += this.nopeus.x;
 
         // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
-        if (this.paikka.x + this.leveys > canvas.width) {
+        if (this.paikka.x + this.leveys > canvas.width +150) {
             this.paikka.x = 0;
         }
     }
