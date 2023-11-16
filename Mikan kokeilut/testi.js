@@ -1,5 +1,8 @@
 const canvas = document.querySelector('#kanvas');
 const ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = true;
+ctx.imageSmoothingQuality = 'medium';
+
 let taustat = [], vanha = 0;
 
 class Pelaaja {
@@ -9,7 +12,7 @@ class Pelaaja {
         this.nykyinenFrame = 0;
         this.yOffset = 25;
         this.xOffset = 50;
-        
+        this.lisays = 0;        
         this.kuva.onload = () => {
             this.leveys = this.kuva.width / this.frameja;
             this.korkeus = this.kuva.height;
@@ -17,6 +20,9 @@ class Pelaaja {
                 x: canvas.width / 2 - this.leveys / 2 + this.xOffset,
                 y: canvas.height-this.korkeus-this.yOffset
             }
+            // console.log(this.leveys+'x'+this.korkeus);
+            this.suhde = this.leveys / this.korkeus;
+            // console.log(this.korkeus * suhde);
     
         }
         this.kuva.src = kuvatiedosto;
@@ -33,9 +39,10 @@ class Pelaaja {
             this.leveys,
             this.korkeus,
             this.paikka.x,
-            this.paikka.y,
-            this.leveys,
-            this.korkeus);
+            this.paikka.y-this.lisays,
+            this.leveys+this.lisays*this.suhde,
+            this.korkeus+this.lisays
+        );
         this.nykyinenFrame = (this.nykyinenFrame < this.frameja-1) ? this.nykyinenFrame += 1 : 0;
     }
 
@@ -104,6 +111,16 @@ window.onload = () => {
         if (!tausta.latautunut) console.log(tausta.kuvatiedosto+' ei ole latautumut!');
     })
     
+    window.addEventListener('keydown', (evnt) => {
+        if (evnt.key == 'ArrowUp' || evnt.code == 'ArrowUp') {
+            pelaaja.lisays += 1;
+        }
+        if (evnt.key == 'ArrowDown' || evnt.code == 'ArrowDown') {
+            pelaaja.lisays -= 1;
+        }
+    });
+
+
     animoi();
 }
 
@@ -132,6 +149,10 @@ function animoi(aika) {
 
             /* piirretään alin tausta */
             taustat[taustat.length-1].piirra(nopeus);
+
+            ctx.fillStyle = 'black';
+            ctx.font = '30px serif';
+            ctx.fillText(pelaaja.korkeus+pelaaja.lisays+'px',4,30);
         }
 
     }
