@@ -8,7 +8,7 @@ const puuImg = new Image();
 puuImg.src = 'puut.png';
 
 const lintuImg = new Image();
-lintuImg.src = 'linnunlento15.png';
+lintuImg.src = 'linnunlento9.png';
 
 const painovoima = 1;
 
@@ -24,7 +24,7 @@ class Pelaaja {
         this.animFrameja = 30;
         this.nykyinenFrame = 0;
         this.leveys = img.width / this.animFrameja;
-        this.korkeus = img.height;
+        this.korkeus = img.height + 10;
         this.paikka = {
             x: canvas.width / 2 - this.leveys / 2,
             y: canvas.height - (this.korkeus -18)
@@ -68,7 +68,7 @@ class Pelaaja {
 
 class Lintu {
     constructor() {
-        this.animFrameja = 15; // Vaihda tason määrä
+        this.animFrameja = 9; // Vaihda tason määrä
         this.nykyinenFrame = 0;
         this.leveys = lintuImg.width / this.animFrameja;
         this.korkeus = 550; // Pienennetty korkeus
@@ -125,7 +125,7 @@ class Aita {
         let x = this.x;
 
         while (x < canvas.width) {
-            this.aidat.push({ x: x, korkeus:80});
+            this.aidat.push({ x: x, korkeus:150});
             x += this.leveys;
         }
     }
@@ -145,7 +145,7 @@ class Aita {
         // Lisää uusi aitaelementti näytön oikeaan reunaan
         this.aidat.push({
             x: this.aidat[this.aidat.length - 1].x + this.leveys,
-            korkeus: 80
+            korkeus: 150
         });
     }
 
@@ -253,7 +253,7 @@ function animoi() {
         // aseta viive, jos ei piirretä
         setTimeout(() => {
             animoi();
-        }, 200); // Viive 100 millisekuntia
+        }, 100); // Viive 100 millisekuntia
     }
         // vaihdetaan seuraavalla kierroksella
     draw = !draw;
