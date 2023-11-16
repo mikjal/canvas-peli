@@ -40,7 +40,7 @@ class Pelaaja {
             this.korkeus,
             this.paikka.x,
             this.paikka.y-this.lisays,
-            this.leveys+this.lisays*this.suhde,
+            (this.korkeus+this.lisays)*this.suhde,
             this.korkeus+this.lisays
         );
         this.nykyinenFrame = (this.nykyinenFrame < this.frameja-1) ? this.nykyinenFrame += 1 : 0;
@@ -152,7 +152,8 @@ function animoi(aika) {
 
             ctx.fillStyle = 'black';
             ctx.font = '30px serif';
-            ctx.fillText(pelaaja.korkeus+pelaaja.lisays+'px',4,30);
+            ctx.fillText(pelaaja.korkeus+pelaaja.lisays+' x '+(pelaaja.korkeus+pelaaja.lisays)*pelaaja.suhde,4,30);
+            console.log()
         }
 
     }
