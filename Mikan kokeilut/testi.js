@@ -6,24 +6,22 @@ ctx.imageSmoothingQuality = 'medium';
 let taustat = [], vanha = 0;
 
 class Pelaaja {
-    constructor(kuvatiedosto) {
+    constructor(kuvatiedosto, framejakuvassa) {
         this.kuva = new Image();
-        this.frameja = 30;
+        this.haluttufps = 30;
+        this.kuvanframet = framejakuvassa;
+        this.framekerroin = this.haluttufps / this.kuvanframet;
         this.nykyinenFrame = 0;
-        this.yOffset = 25;
+        this.yOffsets = [2,0,0,0,2];
         this.xOffset = 50;
-        this.lisays = 0;        
+        this.kuvarivi = 0;
         this.kuva.onload = () => {
-            this.leveys = this.kuva.width / this.frameja;
-            this.korkeus = this.kuva.height;
-            this.paikka = {
+            this.leveys = this.kuva.width / this.kuvanframet;
+            this.korkeus = this.kuva.height / 5;
+            this.piirtopaikka = {
                 x: canvas.width / 2 - this.leveys / 2 + this.xOffset,
-                y: canvas.height-this.korkeus-this.yOffset
+                y: canvas.height-this.korkeus
             }
-            // console.log(this.leveys+'x'+this.korkeus);
-            this.suhde = this.leveys / this.korkeus;
-            // console.log(this.korkeus * suhde);
-    
         }
         this.kuva.src = kuvatiedosto;
         this.nopeus = {
@@ -33,17 +31,23 @@ class Pelaaja {
     }
 
     piirra() {
+ 
+        /* piirretään samaa framea useampi kerta peräkkäin että saadaan siitä sekunnin pituinen (15fps --> 30fps) */
+        let piirrettavaFrame = Math.floor(this.nykyinenFrame / this.framekerroin); 
+
         ctx.drawImage(this.kuva,
-            this.nykyinenFrame*this.leveys,
-            0,
+            piirrettavaFrame*this.leveys,
+            this.kuvarivi*this.korkeus,
             this.leveys,
             this.korkeus,
-            this.paikka.x,
-            this.paikka.y-this.lisays,
-            (this.korkeus+this.lisays)*this.suhde,
-            this.korkeus+this.lisays
+            this.piirtopaikka.x,
+            this.piirtopaikka.y-this.yOffsets[this.kuvarivi],
+            this.leveys,
+            this.korkeus
         );
-        this.nykyinenFrame = (this.nykyinenFrame < this.frameja-1) ? this.nykyinenFrame += 1 : 0;
+
+        this.nykyinenFrame = (this.nykyinenFrame < this.haluttufps-1) ? this.nykyinenFrame += 1 : this.nykyinenFrame = 0;
+
     }
 
     paivita() {
@@ -53,7 +57,7 @@ class Pelaaja {
     }
 }
 
-const pelaaja = new Pelaaja('flatboy-idle.png');
+const pelaaja = new Pelaaja('poika.png',15);
 
 
 class Tausta {
@@ -111,12 +115,24 @@ window.onload = () => {
         if (!tausta.latautunut) console.log(tausta.kuvatiedosto+' ei ole latautumut!');
     })
     
+
+    let nopeudet = [0,3,6,6,0];
+
     window.addEventListener('keydown', (evnt) => {
         if (evnt.key == 'ArrowUp' || evnt.code == 'ArrowUp') {
-            pelaaja.lisays += 1;
+            if (pelaaja.kuvarivi < 4) {
+                pelaaja.kuvarivi += 1;
+                pelaaja.nopeus.x = nopeudet[pelaaja.kuvarivi];
+                if (pelaaja.kuvarivi > 2) pelaaja.nykyinenFrame = 0;
+            }
+            
         }
         if (evnt.key == 'ArrowDown' || evnt.code == 'ArrowDown') {
-            pelaaja.lisays -= 1;
+            if (pelaaja.kuvarivi > 0) {
+                pelaaja.kuvarivi -= 1;
+                pelaaja.nopeus.x = nopeudet[pelaaja.kuvarivi];
+                if (pelaaja.kuvarivi > 2) pelaaja.nykyinenFrame = 0;
+            }
         }
     });
 
@@ -151,9 +167,9 @@ function animoi(aika) {
             taustat[taustat.length-1].piirra(nopeus);
 
             ctx.fillStyle = 'black';
-            ctx.font = '30px serif';
-            ctx.fillText(pelaaja.korkeus+pelaaja.lisays+' x '+(pelaaja.korkeus+pelaaja.lisays)*pelaaja.suhde,4,30);
-            console.log()
+            ctx.font = '20px Arial';
+            ctx.fillText('Animaatiotesti (nuoli ylös/alas vaihtaa animaatiota)',10,25);
+
         }
 
     }
