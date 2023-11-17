@@ -40,32 +40,33 @@
     <div style="display: none; border: 4px solid green; border-bottom: 4px solid transparent; border-top: 4px solid transparent; height: 50px; border-radius: 50%; width: 50px; margin:auto; animation: pyoritys 1s linear infinite;">
     </div>
 
-    <div id="debugger" style="position: fixed; bottom: 0; background-color: #bbbbbb; padding: 10px; left: 50%; transform: translateX(-50%); display: none;">
+    <div id="debugger" style="position: fixed; bottom: 0; background-color: #bbbbbb; padding: 10px;"> <!--  left: 50%; transform: translateX(-50%); -->
         <table style="width: 20em;">
             <tr>
                 <td>FPS (haluttu)</td>
                 <td class="arvo"> <span id="ftime">0</span> (30)</td>
             </tr>
             <tr>
-                <td>Y-koordinaatti</td>
-                <td id="ypaikka" class="arvo">0</td>
+                <td>Pelaajan X,Y</td>
+                <td id="paikka" class="arvo">0</td>
             </tr>
             <tr>
-                <td>Y-nopeus</td>
-                <td id="ynopeus" class="arvo" >0</td>
+                <td>Pelaajan nopeus X,Y</td>
+                <td id="nopeus" class="arvo" >0</td>
+            </tr>
+            <tr>
+                <td>Vaihdetaanko puolta</td>
+                <td id="vpuoli" class="arvo">Ei</td>
             </tr>
             <tr>
                 <td>Lakipiste saavutettu</td>
                 <td id="lakipiste" class="arvo">Ei</td>
             </tr>
             <tr>
-                <td>X-koordinaatti</td>
-                <td id="xpaikka" class="arvo" >0</td>
+                <td>Aidan takana</td>
+                <td id="takana" class="arvo">Ei</td>
             </tr>
-            <tr>
-                <td>X-nopeus</td>
-                <td id="xnopeus" class="arvo" >0</td>
-            </tr>
+
         </table>
     </div>
 <!-- 
