@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hyppypeli</title>
+    <link rel="stylesheet" href="style.css">
     <style>
         body {
             margin: 0;
             overflow: hidden;
         }
-
-        #gameCanvas {
-            background-color: aqua;
-        }
+        .animated-image {
+        position: absolute;
+        transition: transform 0.5s ease-out; /* Käytetään CSS-transitionia animointiin */
+    }
     </style>
 </head>
 <body>
@@ -23,23 +24,34 @@
         const context = canvas.getContext("2d");
 
         // Asetetaan canvas-koon
-        canvas.width = 567;
+        canvas.width = 1024;
         canvas.height = 567;
 
         const characterImg = new Image();
-        characterImg.src = 'char.png';
+        characterImg.src = 'kissa-kavelee.png';
+        characterImg.classList.add('animated-image');
+
+        const characterSprite = {
+            image: characterImg,
+            frameWidth: 257.6, // Kuvan leveys
+            frameHeight: 268, // Kuvan korkeus
+            numberOfFrames: 10, // Kuvan animaatiokehyksien lukumäärä
+            currentFrame: 0, // Nykyinen kehys
+            animationSpeed: 0  // Animaation nopeus
+        };
 
         const fenceImg = new Image();
         fenceImg.src = 'aita-80.png';
 
+
         const character = {
             x: 50,
-            y: canvas.height - 90,
-            width: 80,
-            height: 80,
+            y: canvas.height - 190,
+            width: 100,
+            height: 180,
             color: "blue",
             jumping: false,
-            jumpHeight: 100,
+            jumpHeight: 150,
             jumpCount: 0
         };
 
@@ -51,24 +63,70 @@
             color: "brown"
         };
 
+        class Tausta {
+            constructor() {
+            this.img = new Image();
+            this.img.src = 'taustaLinnut4.png'; // Korvaa tämä taustakuvan polulla
+            this.x = 0;
+            this.y = 0;
+            this.nopeus = 1; // Säädä nopeutta tarpeen mukaan
+            }
+
+            liiku() {
+                this.x -= this.nopeus;
+                if (this.x <= -canvas.width) {
+                    this.x = 0;
+                }
+            }
+
+            piirra() {
+                context.drawImage(this.img, this.x, this.y, canvas.width, canvas.height);
+                context.drawImage(this.img, this.x + canvas.width, this.y, canvas.width, canvas.height);
+            }
+        };
+
+        const tausta = new Tausta();
+
         const aita = {
             aidat: [
-                { x: 50, korkeus: 60 },
-                { x: 150, korkeus: 60 },
+                { x: 0, korkeus: 60 },
+                { x: 200, korkeus: 60 },
+                { x: 400, korkeus: 80 },
+                { x: 600, korkeus: 80 },
+                { x: 800, korkeus: 170 },
+                { x: 1000, korkeus: 60 },
+                
                 // Lisää tarvittaessa muita aitaelementtejä
             ],
-            leveys: 100, // Aidan leveys
+            leveys: 200, // Aidan leveys
             korkeus: 100,  // Aidan korkeus
-            nopeus: 2 // Aidan liikkumisnopeus
+            nopeus: 3 // Aidan liikkumisnopeus
         };
 
         let characterBehindFence = false;
          
         function drawCharacter() {
-            //context.fillStyle = character.color;
-            //context.fillRect(character.x, character.y, character.width, character.height);
-            context.drawImage(characterImg, character.x, character.y, character.width, character.height);
+            const { image, frameWidth, frameHeight, numberOfFrames, currentFrame } = characterSprite;
+
+            context.drawImage(
+                image,
+                currentFrame * frameWidth,
+                0,
+                frameWidth,
+                frameHeight,
+                character.x,
+                character.y,
+                character.width,
+                character.height
+            );
+
+            characterSprite.currentFrame += characterSprite.animationSpeed;
+
+            if (characterSprite.currentFrame >= numberOfFrames) {
+                characterSprite.currentFrame = 0;
+            }
         }
+
 
         function drawFence() {
             // context.fillStyle = fence.color;
@@ -80,6 +138,10 @@
 
         function drawGame() {
             context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Liikuta taustaa oikealta vasemmalle
+            tausta.liiku();
+            tausta.piirra();
 
             // Liikuta aitaa oikealta vasemmalle
             for (let i = 0; i < aita.aidat.length; i++) {
@@ -120,7 +182,7 @@
                 drawFence();  // Piirretään sitten aita
             }
         }
-
+         
         function jump() {
             if (!character.jumping && character.y === canvas.height - character.height) {
                 character.jumping = true;
