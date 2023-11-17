@@ -10,9 +10,12 @@ puuImg.src = 'puut.png';
 const lintuImg = new Image();
 lintuImg.src = 'linnunlento9.png';
 
+const lintuImg2 = new Image();
+lintuImg2.src = 'mustatLinnut.png';
+
 const painovoima = 1;
 
-let canvas, ctx, check = 0, draw = true, pelaaja, aita, puu, lintu, puu2, tausta;
+let canvas, ctx, check = 0, draw = true, pelaaja, aita, puu, lintu, lintu2, puu2, tausta;
 
 const hyppynappi = {
     painettu: false
@@ -21,13 +24,13 @@ const hyppynappi = {
 
 class Pelaaja {
     constructor() {
-        this.animFrameja = 30;
+        this.animFrameja = 10;
         this.nykyinenFrame = 0;
         this.leveys = img.width / this.animFrameja;
         this.korkeus = img.height + 10;
         this.paikka = {
             x: canvas.width / 2 - this.leveys / 2,
-            y: canvas.height - (this.korkeus -18)
+            y: canvas.height - (this.korkeus -16)
         };
         this.nopeus = {
             x: 0,
@@ -39,7 +42,7 @@ class Pelaaja {
 
     piirra() {
         ctx.drawImage(img,
-            this.nykyinenFrame*this.leveys, /* source x */
+            this.nykyinenFrame * this.leveys, /* source x */
             0, /* source y */
             this.leveys,
             this.korkeus,
@@ -47,7 +50,7 @@ class Pelaaja {
             this.paikka.y, /* destination y */
             this.leveys,
             this.korkeus);
-        this.nykyinenFrame = (this.nykyinenFrame < 29) ? this.nykyinenFrame += 1 : 0;
+        this.nykyinenFrame = (this.nykyinenFrame < 9) ? this.nykyinenFrame += 1 : 0;
     }
 
     paivita() {
@@ -71,7 +74,7 @@ class Lintu {
         this.animFrameja = 9; // Vaihda tason määrä
         this.nykyinenFrame = 0;
         this.leveys = lintuImg.width / this.animFrameja;
-        this.korkeus = 550; // Pienennetty korkeus
+        this.korkeus = 540; // Pienennetty korkeus
         this.paikka = {
             x: -170,  // Aseta linnun alku sivun vasempaan reunaan
             y: canvas.height - this.korkeus
@@ -110,6 +113,52 @@ class Lintu {
         this.liiku();
     }
 }
+
+class Lintu2 {
+    constructor() {
+        this.animFrameja = 16; // Vaihda tason määrä
+        this.nykyinenFrame = 0;
+        this.leveys = lintuImg2.width / this.animFrameja;
+        this.korkeus = 590; // Pienennetty korkeus
+        this.paikka = {
+            x: -210,  // Aseta linnun alku sivun vasempaan reunaan
+            y: canvas.height - this.korkeus
+        };
+        this.nopeus = {
+            x: 20,  // Aseta linnun vaakasuuntainen nopeus
+            y: 0
+        };
+    }
+
+    piirra() {
+        ctx.drawImage(lintuImg2,
+            this.nykyinenFrame * this.leveys, /* source x */
+            0, /* source y */
+            this.leveys,
+            this.korkeus,
+            this.paikka.x, /* destination x */
+            this.paikka.y, /* destination y */
+            this.leveys / 2,
+            this.korkeus / 2);
+        this.nykyinenFrame = (this.nykyinenFrame < this.animFrameja - 1) ? this.nykyinenFrame += 1 : 0;
+    }
+
+    liiku() {
+        // Vaakasuuntainen liike
+        this.paikka.x += this.nopeus.x;
+
+        // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
+        if (this.paikka.x + this.leveys > canvas.width +150) {
+            this.paikka.x = 0;
+        }
+    }
+
+    paivita() {
+        this.piirra();
+        this.liiku();
+    }
+}
+
 class Aita {
     constructor(x, korkeus, leveys, nopeus) {
         this.x = x;
@@ -232,6 +281,8 @@ function animoi() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         tausta.liiku();
         tausta.piirra();
+        lintu2.liiku();
+        lintu2.piirra();
         lintu.liiku();
         lintu.piirra();
         //ctx.drawImage(puuImg, 0, 150, canvas.width, canvas.height - img.height);
@@ -243,8 +294,6 @@ function animoi() {
         aita.piirra();
         pelaaja.paivita();
     }
-
-
 
     if (draw) {
         // aseta uusi animaatiokutsu, jos piirretään
@@ -268,6 +317,8 @@ window.onload = () => {
     puu = new Puu(); // Tässä luodaan puu
     puu2 = new Puu_rivi();
     lintu = new Lintu();
+    lintu2 = new Lintu2();
+
     animoi();
 
     window.addEventListener('keydown', (eve) => {

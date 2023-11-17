@@ -1,3 +1,5 @@
 #gameCanvas {
-    background-color: aquamarine;
+    /*background-color: aqua;*/
+    background-image: url('taustaLinnut4.png'); /* Käytä oikeaa tiedostonimeä */
+    background-size: cover;
 }
