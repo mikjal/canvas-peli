@@ -27,10 +27,10 @@ class Pelaaja {
         this.animFrameja = 10;
         this.nykyinenFrame = 0;
         this.leveys = img.width / this.animFrameja;
-        this.korkeus = img.height + 10;
+        this.korkeus = img.height;
         this.paikka = {
             x: canvas.width / 2 - this.leveys / 2,
-            y: canvas.height - (this.korkeus -16)
+            y: canvas.height - (this.korkeus - 50)
         };
         this.nopeus = {
             x: 0,
@@ -48,8 +48,8 @@ class Pelaaja {
             this.korkeus,
             this.paikka.x, /* destination x */
             this.paikka.y, /* destination y */
-            this.leveys,
-            this.korkeus);
+            this.leveys - (this.leveys/4),
+            this.korkeus - (this.korkeus/4));
         this.nykyinenFrame = (this.nykyinenFrame < 9) ? this.nykyinenFrame += 1 : 0;
     }
 
