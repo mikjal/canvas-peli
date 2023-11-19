@@ -3,7 +3,53 @@ const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = true;
 ctx.imageSmoothingQuality = 'medium';
 
-let taustat = [], vanha = 0, painovoima = 0.5;
+let taustat = [], vanha = 0, painovoima = 0.5, vasenreunaX = 0;
+let aitaelementit =  [0,1,1,2,2,1,2,2,2];
+let elementinPituus = 300, aidat = [];
+const elementtienpituudet = [300, 142, 200];
+const elementtienoffsetit = [0,2,0]; //jos samaa elementtiä on monta peräkkäin, meneekö uusi kuva edellisen päälle?
+
+class Aita {
+    constructor(tyyppi,xpos,pituus) {
+        this.tyyppi = tyyppi;
+        this.yOffset = 0;
+        this.leveys = pituus;
+        this.korkeus = 90;
+        this.paikka = {
+            x: xpos,
+            y: canvas.height - this.yOffset - 90
+        }
+    }
+
+    piirra() {
+        ctx.fillStyle = (this.tyyppi == 1) ? 'yellow' : 'red';
+        let piirtopaikka = this.paikka.x+pelaaja.piirtopaikka.x-pelaaja.paikka.x;
+        // ?
+        let pelaajankohta = pelaaja.paikka.x-this.paikka.x;
+        ctx.fillRect(piirtopaikka,this.paikka.y,this.leveys,100);
+        //console.log(pelaajankohta,this.paikka.x);
+    }
+
+    paivita() {
+        this.piirra();
+        this.x += pelaaja.nopeus.x;
+    }
+}
+
+let kohta = 0, edellinen = 0;
+aitaelementit.forEach((arvo) => {
+    // laskuri joka laskee seuraavan elementin paikkaa
+    // jos sama elementti kuin edellinen, vähennetään offset
+    if (arvo != 0) {
+        kohta = (edellinen == arvo) ? kohta-elementtienoffsetit[arvo] : kohta;
+        aidat.push(new Aita(arvo,kohta,elementtienpituudet[arvo]));
+        console.log(kohta);
+        kohta += elementtienpituudet[arvo];
+    } else { // Arvon on 0
+        kohta += elementtienpituudet[0];
+    }
+    edellinen = arvo;
+});
 
 class Pelaaja {
     constructor(kuvatiedosto, framejakuvassa) {
@@ -15,6 +61,7 @@ class Pelaaja {
         this.yOffsets = [2,0,0,0,2];
         this.xOffset = 50;
         this.kuvarivi = 0; // Mitä animaatio-"riviä" käytetään
+        this.hyppyKaynnissa = false;
         this.hitbox = [ 
                 { // paikallaan
                     alkaa: 0,
@@ -45,7 +92,7 @@ class Pelaaja {
             this.leveys = this.kuva.width / this.kuvanframet;
             this.korkeus = this.kuva.height / 5;
             this.piirtopaikka = {
-                x: canvas.width / 2 - this.leveys / 2 + this.xOffset,
+                x: Math.round(canvas.width / 2 - this.leveys / 2 + this.xOffset),
                 y: canvas.height-this.korkeus
             }
         }
@@ -95,6 +142,9 @@ class Pelaaja {
         
         this.piirra();
 
+        vasenreunaX = this.paikka.x - this.piirtopaikka.x;
+        // console.log(vasenreunaX,vasenreunaX+canvas.width);
+
         // Nopeuden vaikutus
         this.paikka.x += this.nopeus.x; 
         this.paikka.y += this.nopeus.y;
@@ -110,6 +160,7 @@ class Pelaaja {
         }
         // Ollaanko "maan" tasolla?
         if (this.nopeus.y == 0 && this.paikka.y == 0) {
+            this.hyppyKaynnissa = false;
             this.vaihdetaanPuolta = false;
             this.lakipiste = false;
         }
@@ -170,7 +221,7 @@ taustat = [
 /* odotetaan että sivu on latautunut */
 window.onload = () => {
 
-    taustat.forEach(tausta => {
+    taustat.forEach((tausta) => {
         if (!tausta.latautunut) console.log(tausta.kuvatiedosto+' ei ole latautumut!');
     })
     
@@ -179,15 +230,21 @@ window.onload = () => {
 
     window.addEventListener('keydown', (evnt) => {
         if (evnt.key == 'ArrowUp' || evnt.code == 'ArrowUp') {
-            pelaaja.nopeus.y = -8;
-            // vaihdetaan puolta jos pelaaja ei ole aidan takana, muussa tapauksessa ei vaihdeta puolta
-            pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == false) ? true : false;
+            if (pelaaja.hyppyKaynnissa == false) {
+                pelaaja.hyppyKaynnissa = true;
+                pelaaja.nopeus.y = -8;
+                // vaihdetaan puolta jos pelaaja ei ole aidan takana, muussa tapauksessa ei vaihdeta puolta
+                pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == false) ? true : false;
+            }
         }
 
         if (evnt.key == 'ArrowDown' || evnt.code == 'ArrowDown') {
-            pelaaja.nopeus.y = -8;
-            // vaihdetaan puolta jos pelaaja on aidan takana, muussa tapauksessa ei vaihdeta puolta
-            pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == true) ? true : false;
+            if (pelaaja.hyppyKaynnissa == false) {
+                pelaaja.hyppyKaynnissa = true;
+                pelaaja.nopeus.y = -8;
+                // vaihdetaan puolta jos pelaaja on aidan takana, muussa tapauksessa ei vaihdeta puolta
+                pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == true) ? true : false;
+            }
         }
 
         if (evnt.key == 'ArrowRight' || evnt.code == 'ArrowRight') {
@@ -234,15 +291,29 @@ function animoi(aika) {
                 taustat[i].piirra(nopeus);
             };
 
-            /* piirretään ja päivitetään pelaajan hahmo */
-            pelaaja.paivita();
+            if (pelaaja.aidanTakana == true) {
+                pelaaja.paivita();
+                //aidat[0].paivita();
+                aidat.forEach((aita) => {
+                    aita.paivita();
+                });
+            } else {
+                aidat.forEach((aita) => {
+                    aita.paivita();
+                });
+                // aidat[0].paivita();
+                pelaaja.paivita();
+            }
+            
+
+            
 
             /* piirretään alin tausta */
             taustat[taustat.length-1].piirra(nopeus);
 
             ctx.fillStyle = 'black';
             ctx.font = '16px Arial';
-            ctx.fillText('Nuoli vasemmalla/oikealle vaihtaa animaatiota, nuoli ylös/alas hyppää, ei aitaa, punainen alue = "hitbox"',10,25);
+            ctx.fillText('KOODI KESKEN - Nuoli vasemmalla/oikealle vaihtaa animaatiota, nuoli ylös/alas hyppää, ei aitaa, punainen alue = "hitbox"',10,25);
 
             // Debug
             document.querySelector('#paikka').innerText = pelaaja.paikka.x + ', ' +pelaaja.paikka.y;
