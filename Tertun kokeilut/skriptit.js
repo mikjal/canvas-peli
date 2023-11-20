@@ -1,5 +1,5 @@
 const img = new Image();
-img.src = './kissa-kaveleeUusin.png';
+img.src = './kissa-juoksee.png';
 
 const aitaImg = new Image();
 aitaImg.src = 'tiiliaita3.png';
