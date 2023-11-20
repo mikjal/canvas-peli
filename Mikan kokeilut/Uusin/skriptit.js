@@ -365,11 +365,9 @@ function animoi(aika) {
             /* piirretään alin tausta */
             lahinTausta.piirra(pelaaja.nopeus.x);
 
-            /*
             ctx.fillStyle = 'black';
             ctx.font = '16px Arial';
-            ctx.fillText('KOODI KESKEN - Nuoli vasemmalla/oikealle vaihtaa animaatiota, nuoli ylös/alas hyppää, ei aitaa, punainen alue = "hitbox"',10,25);
-            */
+            ctx.fillText('DEMO - Nuoli vasemmalla/oikealle vaihtaa animaatiota, nuoli ylös/alas hyppää puolelta toiselle, ei aitaa, pelaajan punainen alue = "hitbox"',10,25);
 
             // Debug
             document.querySelector('#paikka').innerText = pelaaja.paikka.x + ', ' +pelaaja.paikka.y;
