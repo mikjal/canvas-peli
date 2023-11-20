@@ -28,16 +28,16 @@
         canvas.height = 567;
 
         const characterImg = new Image();
-        characterImg.src = 'kissa-kavelee.png';
+        characterImg.src = 'kissa-hyppaaUusin.png';
         characterImg.classList.add('animated-image');
 
         const characterSprite = {
             image: characterImg,
-            frameWidth: 257.6, // Kuvan leveys
+            frameWidth: 258, // Kuvan leveys
             frameHeight: 268, // Kuvan korkeus
             numberOfFrames: 10, // Kuvan animaatiokehyksien lukumäärä
             currentFrame: 0, // Nykyinen kehys
-            animationSpeed: 0  // Animaation nopeus
+            animationSpeed: 0.2 // Animaation nopeus
         };
 
         const fenceImg = new Image();
@@ -46,27 +46,27 @@
 
         const character = {
             x: 50,
-            y: canvas.height - 190,
+            y: canvas.height - 250,
             width: 100,
             height: 180,
-            color: "blue",
+            //color: "blue",
             jumping: false,
             jumpHeight: 150,
             jumpCount: 0
         };
 
-        const fence = {
+        /*const fence = {
             x: 0,
-            y: canvas.height - 30,
+            y: canvas.height - 5,
             width: canvas.width,
-            height: 40,
+            height: 50,
             color: "brown"
-        };
+        };*/
 
         class Tausta {
             constructor() {
             this.img = new Image();
-            this.img.src = 'taustaLinnut4.png'; // Korvaa tämä taustakuvan polulla
+            this.img.src = 'taustaLinnut4.png';
             this.x = 0;
             this.y = 0;
             this.nopeus = 1; // Säädä nopeutta tarpeen mukaan
@@ -108,16 +108,18 @@
         function drawCharacter() {
             const { image, frameWidth, frameHeight, numberOfFrames, currentFrame } = characterSprite;
 
-            context.drawImage(
-                image,
-                currentFrame * frameWidth,
-                0,
-                frameWidth,
-                frameHeight,
-                character.x,
-                character.y,
-                character.width,
-                character.height
+            // Säätelee kuinka usein piirretään uusi kehys
+            if (Math.floor(characterSprite.currentFrame) < numberOfFrames) {
+                    context.drawImage(
+                        image,
+                        Math.floor(currentFrame) * frameWidth,
+                        0,
+                        frameWidth,
+                        frameHeight,
+                        character.x,
+                        character.y,
+                        character.width,
+                        character.height
             );
 
             characterSprite.currentFrame += characterSprite.animationSpeed;
@@ -125,8 +127,8 @@
             if (characterSprite.currentFrame >= numberOfFrames) {
                 characterSprite.currentFrame = 0;
             }
+            }
         }
-
 
         function drawFence() {
             // context.fillStyle = fence.color;
@@ -184,15 +186,30 @@
         }
          
         function jump() {
-            if (!character.jumping && character.y === canvas.height - character.height) {
+            if (!character.jumping && character.y >= canvas.height - character.height) {
                 character.jumping = true;
+                // Tallenna alkuperäinen y-koordinaatti hyppäämisen alussa
+                character.originalY = character.y;
+            }
+            if (character.jumping) {
+                character.y -= 5;
+                character.jumpCount += 5;
+
+                if (character.jumpCount >= character.jumpHeight) {
+                    character.jumping = false;
+                    character.jumpCount = 0;
+                    // Palauta alkuperäinen y-koordinaatti hyppäämisen lopussa
+                    character.y = character.originalY;
+                }
+            } else if (character.y < canvas.height - character.height) {
+                character.y += 5;
             }
         }
 
         document.addEventListener("keydown", (event) => {
-            if (event.key === " ") {
+            if (event.key === "ArrowUp") {
                 jump();
-            }
+            }   
         });
 
         setInterval(drawGame, 1000 / 60);
