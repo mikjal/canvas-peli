@@ -67,7 +67,7 @@ class Pelaaja {
         this.yOffsets = [16,14,14,14]; // kissa
         //this.yOffsets = [2,0,0,0,2]; // poika
         this.xOffset = 50;
-        this.kuvarivienlkm = 2; // Montako animaatioriviä kuvatiedostossa on?
+        this.kuvarivienlkm = 1; // Montako animaatioriviä kuvatiedostossa on?
         this.kuvarivi = 0; // Mitä animaatio-"riviä" käytetään
         this.hyppyKaynnissa = false;
         this.hitbox = [ 
@@ -192,7 +192,7 @@ class Pelaaja {
 }
 
 //const pelaaja = new Pelaaja('poika.png',15);
-const pelaaja = new Pelaaja('kissa-2.png',10);
+const pelaaja = new Pelaaja('kissa-juoksee.png',10);
 
 class Tausta {
     constructor(x,y,leveys,korkeus,yOffset,nopeuskerroin) {
