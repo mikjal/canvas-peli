@@ -192,7 +192,7 @@ class Pelaaja {
 }
 
 //const pelaaja = new Pelaaja('poika.png',15);
-const pelaaja = new Pelaaja('kissa-juoksee.png',10);
+const pelaaja = new Pelaaja('kissa-juoksee2.png',10);
 
 class Tausta {
     constructor(x,y,leveys,korkeus,yOffset,nopeuskerroin) {
@@ -326,7 +326,6 @@ window.onload = () => {
 
     });
 
-
     animoi();
 }
 
@@ -345,6 +344,7 @@ function animoi(aika) {
             ctx.fillStyle = 'skyblue';
             ctx.fillRect(0,0,canvas.width,canvas.height);
            
+            pelaaja.nopeus.x = 6;
             let nopeus = pelaaja.nopeus.x;
 
             /* piirretään kaikki taustat (paitsi katsojaa lähinnä oleva) siinä järjestyksessä kuin ne ovat arrayssa */
