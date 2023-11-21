@@ -64,9 +64,10 @@ class Pelaaja {
         this.kuvanframet = framejakuvassa;
         this.framekerroin = this.haluttufps / this.kuvanframet;
         this.nykyinenFrame = 0;
-        this.yOffsets = [10,14,14,14]; // kissa
+        this.yOffsets = [16,14,14,14]; // kissa
         //this.yOffsets = [2,0,0,0,2]; // poika
         this.xOffset = 50;
+        this.kuvarivienlkm = 2; // Montako animaatioriviä kuvatiedostossa on?
         this.kuvarivi = 0; // Mitä animaatio-"riviä" käytetään
         this.hyppyKaynnissa = false;
         this.hitbox = [ 
@@ -98,7 +99,7 @@ class Pelaaja {
         this.laskuri = 0;
         this.kuva.onload = () => {
             this.leveys = this.kuva.width / this.kuvanframet;
-            this.korkeus = this.kuva.height / 4; // MOntako animaatioriviä kuvatiedostossa on?
+            this.korkeus = this.kuva.height / this.kuvarivienlkm; 
             this.piirtopaikka = {
                 x: Math.round(canvas.width / 2 - this.leveys / 2 + this.xOffset),
                 y: canvas.height-this.korkeus
@@ -191,7 +192,7 @@ class Pelaaja {
 }
 
 //const pelaaja = new Pelaaja('poika.png',15);
-const pelaaja = new Pelaaja('kissa.png',10);
+const pelaaja = new Pelaaja('kissa-2.png',10);
 
 class Tausta {
     constructor(x,y,leveys,korkeus,yOffset,nopeuskerroin) {
@@ -308,7 +309,7 @@ window.onload = () => {
         }
 
         if (evnt.key == 'ArrowRight' || evnt.code == 'ArrowRight') {
-            if (pelaaja.kuvarivi < 4) {
+            if (pelaaja.kuvarivi < pelaaja.kuvarivienlkm-1) {
                 pelaaja.kuvarivi += 1;
                 pelaaja.nopeus.x = nopeudet[pelaaja.kuvarivi];
                 if (pelaaja.kuvarivi > 2) pelaaja.nykyinenFrame = 0;
