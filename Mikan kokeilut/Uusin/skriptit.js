@@ -8,6 +8,7 @@ taustakuva.src = 'taustat.png';
 
 let taustat = [], vanha = 0, painovoima = 0.5, vasenreunaX = 0, pistemaara = 0, pistelisays = 50;
 // radan aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3= tiiliaidan pääty
+// HUOM! 2 jälkeen aina 3 että tiiliaita päättyy siististi!
 let aitaelementit =  [0,0,1,1,2,2,3,1,1,2,3,1,2,3,1];
 let aidat = [];
 // "aitaelementtien" leveydet
