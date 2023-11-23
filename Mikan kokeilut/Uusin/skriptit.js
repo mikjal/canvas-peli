@@ -7,30 +7,48 @@ const taustakuva = new Image();
 taustakuva.src = 'taustat.png';
 
 let taustat = [], vanha = 0, painovoima = 0.5, vasenreunaX = 0;
-let aitaelementit =  [0,1,1,2,2,1,2,2,2];
-let elementinPituus = 300, aidat = [];
-const elementtienpituudet = [300, 142, 200];
-const elementtienoffsetit = [0,2,0]; //jos samaa elementtiä on monta peräkkäin, meneekö uusi kuva edellisen päälle?
+// radan aidat, 0 = ei aitaa, 1 = puuaita, 2 = kiviaita
+let aitaelementit =  [0,1,1,1,2,2,1,2,2,2,1,2,2,2,2,1,1,1,2,2,2,2,2,2,2,2,2,2];
+let aidat = [];
+// "aitaelementtien" leveydet
+const elementtienpituudet = [300, 142, 219];
+// jos samaa elementtiä on monta peräkkäin, montako pikseliä seuraava kuva menee edellisen päälle?
+const elementtienoffsetit = [0,2,10]; 
 
 class Aita {
     constructor(tyyppi,xpos,pituus) {
         this.tyyppi = tyyppi;
         this.yOffset = 0;
-        this.leveys = pituus;
-        this.korkeus = 90;
+        this.kuva = {
+            // puuaidan kuvan vasemman reunan x-koordinaatti taustat.png:ssä  on 1180
+            // kiviaidan kuvan vasemman reunan x-koordinaatti on 1335
+            x: (this.tyyppi == 1) ? 1180 : 1335, 
+            y: 0,
+            leveys: pituus,
+            // puuaidan korkeus on 80 ja kiviaidan 115
+            korkeus: (this.tyyppi == 1) ? 80 : 115,
+        }
         this.paikka = {
             x: xpos,
-            y: canvas.height - this.yOffset - 90
+            y: canvas.height - this.yOffset - this.kuva.korkeus - 25
         }
+        this.nakyvilla = false;
     }
 
     piirra() {
-        ctx.fillStyle = (this.tyyppi == 1) ? 'yellow' : 'red';
         let piirtopaikka = this.paikka.x+pelaaja.piirtopaikka.x-pelaaja.paikka.x;
-        // ?
-        let pelaajankohta = pelaaja.paikka.x-this.paikka.x;
-        if (piirtopaikka+this.leveys >= 0 && piirtopaikka <= canvas.width) {
-            ctx.fillRect(piirtopaikka,this.paikka.y,this.leveys,100);
+        //let pelaajankohta = pelaaja.paikka.x-this.paikka.x;
+        
+        // tarkastetaan onko aidan osa näkyvissä
+        if (piirtopaikka+this.kuva.leveys >= 0 && piirtopaikka <= canvas.width) {
+            if (this.tyyppi != 0) {
+                ctx.drawImage(taustakuva,
+                    this.kuva.x,this.kuva.y,this.kuva.leveys,this.kuva.korkeus, // Source
+                    piirtopaikka, this.paikka.y, this.kuva.leveys, this.kuva.korkeus // Destination
+                );
+                this.nakyvilla = true;
+            } else this.nakyvilla = false;
+
         }
         
         //console.log(pelaajankohta,this.paikka.x);
@@ -49,7 +67,7 @@ aitaelementit.forEach((arvo) => {
     if (arvo != 0) {
         kohta = (edellinen == arvo) ? kohta-elementtienoffsetit[arvo] : kohta;
         aidat.push(new Aita(arvo,kohta,elementtienpituudet[arvo]));
-        //console.log(kohta);
+        //console.log(arvo,kohta,elementtienpituudet[arvo]);
         kohta += elementtienpituudet[arvo];
     } else { // Arvon on 0
         kohta += elementtienpituudet[0];
@@ -64,10 +82,10 @@ class Pelaaja {
         this.kuvanframet = framejakuvassa;
         this.framekerroin = this.haluttufps / this.kuvanframet;
         this.nykyinenFrame = 0;
-        this.yOffsets = [16,14,14,14]; // kissa
-        //this.yOffsets = [2,0,0,0,2]; // poika
+        //this.yOffsets = [16,14,14,14]; // kissa
+        this.yOffsets = [2,0,0,0,2]; // poika
         this.xOffset = 50;
-        this.kuvarivienlkm = 1; // Montako animaatioriviä kuvatiedostossa on?
+        this.kuvarivienlkm = 5; // Montako animaatioriviä kuvatiedostossa on?
         this.kuvarivi = 0; // Mitä animaatio-"riviä" käytetään
         this.hyppyKaynnissa = false;
         this.hitbox = [ 
@@ -191,8 +209,8 @@ class Pelaaja {
     }
 }
 
-//const pelaaja = new Pelaaja('poika.png',15);
-const pelaaja = new Pelaaja('kissa-juoksee2.png',10);
+const pelaaja = new Pelaaja('poika.png',15);
+//const pelaaja = new Pelaaja('kissa-juoksee2.png',10);
 
 class Tausta {
     constructor(x,y,leveys,korkeus,yOffset,nopeuskerroin) {
@@ -344,9 +362,6 @@ function animoi(aika) {
             ctx.fillStyle = 'skyblue';
             ctx.fillRect(0,0,canvas.width,canvas.height);
            
-            pelaaja.nopeus.x = 6;
-            let nopeus = pelaaja.nopeus.x;
-
             /* piirretään kaikki taustat (paitsi katsojaa lähinnä oleva) siinä järjestyksessä kuin ne ovat arrayssa */
             taustat.forEach((tausta) => {
                 tausta.piirra(pelaaja.nopeus.x);
@@ -363,7 +378,7 @@ function animoi(aika) {
                 aidat.forEach((aita) => {
                     aita.paivita();
                 });
-                // aidat[0].paivita();
+                //aidat[0].paivita();
                 pelaaja.paivita();
             }
 
