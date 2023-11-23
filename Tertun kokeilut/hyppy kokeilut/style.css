@@ -3,3 +3,14 @@
     background-image: url('taustaLinnut4.png'); /* Käytä oikeaa tiedostonimeä */
     background-size: cover;
 }
+h1 {
+    position: absolute;
+    top: 258px;
+    left: 412px;
+    background-color: rgb(243, 233, 144);
+    width: 200px;
+    height: 50px;
+    text-align: center;
+    font: Cambria, serif;
+    border-color: blue;
+}
