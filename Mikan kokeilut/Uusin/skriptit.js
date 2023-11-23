@@ -7,11 +7,11 @@ const taustakuva = new Image();
 taustakuva.src = 'taustat.png';
 
 let taustat = [], vanha = 0, painovoima = 0.5, vasenreunaX = 0, pistemaara = 0, pistelisays = 50;
-// radan aidat, 0 = ei aitaa, 1 = puuaita, 2 = kiviaita
-let aitaelementit =  [0,0,1,1,2,2,1,1,2,1,2,1];
+// radan aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3= tiiliaidan pääty
+let aitaelementit =  [0,0,1,1,2,2,3,1,1,2,3,1,2,3,1];
 let aidat = [];
 // "aitaelementtien" leveydet
-const elementtienpituudet = [300, 142, 219];
+const elementtienpituudet = [300, 142, 220, 29];
 // jos samaa elementtiä on monta peräkkäin, montako pikseliä seuraava kuva menee edellisen päälle?
 const elementtienoffsetit = [0,2,0]; 
 
@@ -25,7 +25,7 @@ class Aita {
             x: (this.tyyppi == 1) ? 1180 : 1335, 
             y: 0,
             leveys: pituus,
-            // puuaidan korkeus on 80 ja kiviaidan 115
+            // puuaidan korkeus on 80 ja tiiliaidan 118
             korkeus: (this.tyyppi == 1) ? 80 : 118,
         }
         this.paikka = {
@@ -391,7 +391,7 @@ function animoi(aika) {
             while (pmaara.length < 6) {
                 pmaara = '0' + pmaara;
             }
-            
+
             ctx.fillStyle = (pistelisays > 0) ? 'black' : 'red';
             ctx.font = '32px Arial';
             ctx.fillText(pmaara,canvas.width/2-40,32);
