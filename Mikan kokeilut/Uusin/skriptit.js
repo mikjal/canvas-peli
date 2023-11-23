@@ -6,14 +6,14 @@ ctx.imageSmoothingQuality = 'medium';
 const taustakuva = new Image();
 taustakuva.src = 'taustat.png';
 
-let taustat = [], vanha = 0, painovoima = 0.5, vasenreunaX = 0;
+let taustat = [], vanha = 0, painovoima = 0.5, vasenreunaX = 0, pistemaara = 0, pistelisays = 50;
 // radan aidat, 0 = ei aitaa, 1 = puuaita, 2 = kiviaita
-let aitaelementit =  [0,1,1,1,2,2,1,2,2,2,1,2,2,2,2,1,1,1,2,2,2,2,2,2,2,2,2,2];
+let aitaelementit =  [0,0,1,1,2,2,1,1,2,1,2,1];
 let aidat = [];
 // "aitaelementtien" leveydet
 const elementtienpituudet = [300, 142, 219];
 // jos samaa elementtiä on monta peräkkäin, montako pikseliä seuraava kuva menee edellisen päälle?
-const elementtienoffsetit = [0,2,10]; 
+const elementtienoffsetit = [0,2,0]; 
 
 class Aita {
     constructor(tyyppi,xpos,pituus) {
@@ -26,25 +26,26 @@ class Aita {
             y: 0,
             leveys: pituus,
             // puuaidan korkeus on 80 ja kiviaidan 115
-            korkeus: (this.tyyppi == 1) ? 80 : 115,
+            korkeus: (this.tyyppi == 1) ? 80 : 118,
         }
         this.paikka = {
             x: xpos,
             y: canvas.height - this.yOffset - this.kuva.korkeus - 25
         }
         this.nakyvilla = false;
+        this.piirtopaikka = 0;
     }
 
     piirra() {
-        let piirtopaikka = this.paikka.x+pelaaja.piirtopaikka.x-pelaaja.paikka.x;
+        this.piirtopaikka = this.paikka.x+pelaaja.piirtopaikka.x-pelaaja.paikka.x;
         //let pelaajankohta = pelaaja.paikka.x-this.paikka.x;
         
-        // tarkastetaan onko aidan osa näkyvissä
-        if (piirtopaikka+this.kuva.leveys >= 0 && piirtopaikka <= canvas.width) {
+        // tarkastetaan onko aidan osa näkyvissä, jos on piirretään se
+        if (this.piirtopaikka+this.kuva.leveys >= 0 && this.piirtopaikka <= canvas.width) {
             if (this.tyyppi != 0) {
                 ctx.drawImage(taustakuva,
                     this.kuva.x,this.kuva.y,this.kuva.leveys,this.kuva.korkeus, // Source
-                    piirtopaikka, this.paikka.y, this.kuva.leveys, this.kuva.korkeus // Destination
+                    this.piirtopaikka, this.paikka.y, this.kuva.leveys, this.kuva.korkeus // Destination
                 );
                 this.nakyvilla = true;
             } else this.nakyvilla = false;
@@ -57,6 +58,18 @@ class Aita {
     paivita() {
         this.piirra();
         this.x += pelaaja.nopeus.x;
+    }
+
+    osuuko(pelaajanHahmoAlkaa,pelaajanHahmoPaattyy) {
+        if (!this.nakyvilla || this.tyyppi == 1) {
+            return false
+        } else {
+            //console.log(pelaajanHahmoAlkaa,pelaajanHahmoPaattyy,this.piirtopaikka,this.piirtopaikka+this.kuva.leveys);
+            if (pelaajanHahmoPaattyy >= this.piirtopaikka && pelaajanHahmoAlkaa <= this.piirtopaikka+this.kuva.leveys)
+                return true;
+        }
+        
+
     }
 }
 
@@ -167,17 +180,27 @@ class Pelaaja {
         */
     }
 
+    tarkastaOsuma() {
+        let osumat = 0;
+        aidat.forEach((aita) => {
+            if (aita.osuuko(this.piirtopaikka.x+this.hitbox[this.kuvarivi].alkaa,this.piirtopaikka.x+this.hitbox[this.kuvarivi].paattyy)) {
+                osumat += 1;
+            }
+        });
+        document.querySelector('#kaatuu').innerText = (osumat == 0) ? 'Ei' : 'Kyllä';
+
+    }
+
     paivita() {
         
         // Debug: montako framea näytetään hypyn aikana?
-        /*
         if (this.hyppyKaynnissa) {
             this.laskuri += 1;
             console.log(this.laskuri);
         }
-        */
 
-        this.piirra();
+
+        if (this.nopeus.x != 0) pistelisays -= 0.2;
 
         vasenreunaX = this.paikka.x - this.piirtopaikka.x;
 
@@ -193,7 +216,11 @@ class Pelaaja {
         if (edellinen < 0 && this.nopeus.y >= 0) {
             this.lakipiste = true;
             // Vaihdetaanko puolta?
-            this.aidanTakana = (this.vaihdetaanPuolta == true) ? !this.aidanTakana : this.aidanTakana;
+            //this.aidanTakana = (this.vaihdetaanPuolta == true) ? !this.aidanTakana : this.aidanTakana;
+            if (this.vaihdetaanPuolta) {
+                this.aidanTakana = !this.aidanTakana;
+                pistelisays = 50;
+            }
         }
         // Ollaanko "maan" tasolla?
         if (this.paikka.y >= 0 && this.hyppyKaynnissa) {
@@ -205,6 +232,11 @@ class Pelaaja {
             this.laskuri = 0;
         }
 
+        this.piirra();
+
+        this.tarkastaOsuma();
+
+        if (this.nopeus.x != 0) pistemaara += pistelisays;
 
     }
 }
@@ -255,38 +287,6 @@ class Tausta {
         }
     }
 }
-
-/*
-class Tausta {
-    constructor(kuvatiedosto, yPaikka, kerroin) { 
-        this.kuva = new Image();
-        this.latautunut = false;
-        this.kuva.onload = () => { 
-            this.leveys = this.kuva.width;
-            this.korkeus = this.kuva.height;
-            this.y = (yPaikka < 0) ? Math.abs(this.korkeus+yPaikka) : yPaikka; 
-            this.latautunut = true;
-         };
-        this.kuva.src = kuvatiedosto;
-        this.x = 0;
-        this.kerroin = kerroin;
-    }
-
-    piirra(nopeus) {
-        ctx.drawImage(this.kuva,this.x,this.y);
-        this.x -= nopeus*this.kerroin;
-        if (this.leveys+Math.round(this.x)-canvas.width <= 0) {
-            ctx.drawImage(this.kuva,Math.round(this.x)+this.leveys,this.y);
-            if (Math.round(this.x) + this.leveys <= 0) {
-                this.x = this.x + this.leveys;
-            }
-        }
-    }
-
-}
-*/
-
-
 
 /* odotetaan että sivu on latautunut */
 window.onload = () => {
@@ -385,9 +385,16 @@ function animoi(aika) {
             /* piirretään alin tausta */
             lahinTausta.piirra(pelaaja.nopeus.x);
 
-            ctx.fillStyle = 'black';
-            ctx.font = '16px Arial';
-            ctx.fillText('DEMO - Nuoli vasemmalla/oikealle vaihtaa animaatiota, nuoli ylös/alas hyppää puolelta toiselle, ei törmäystarkastusta',10,25);
+            let luku = Math.round(pistemaara / 10);
+            let pmaara = (luku < 0) ? '0' : luku.toString();
+
+            while (pmaara.length < 6) {
+                pmaara = '0' + pmaara;
+            }
+            
+            ctx.fillStyle = (pistelisays > 0) ? 'black' : 'red';
+            ctx.font = '32px Arial';
+            ctx.fillText(pmaara,canvas.width/2-40,32);
 
             // Debug
             document.querySelector('#paikka').innerText = pelaaja.paikka.x + ', ' +pelaaja.paikka.y;
