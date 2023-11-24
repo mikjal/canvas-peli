@@ -11,10 +11,10 @@ let taustat = [], vanha = 0, painovoima = 0.5, vasenreunaX = 0, pistemaara = 0, 
 // HUOM! 2 jälkeen aina 3 että tiiliaita päättyy siististi!
 let aitaelementit =  [0,0,1,1,2,2,3,1,1,2,3,1,2,3,1];
 let aidat = [];
-// "aitaelementtien" leveydet
+// "aitaelementtien" leveydet (tyhjä = 300, puuaita = 142, tiiliaita = 220, tiiliaidan pääty = 29)
 const elementtienpituudet = [300, 142, 220, 29];
 // jos samaa elementtiä on monta peräkkäin, montako pikseliä seuraava kuva menee edellisen päälle?
-const elementtienoffsetit = [0,2,0]; 
+const elementtienoffsetit = [0,2,0,0]; 
 
 class Aita {
     constructor(tyyppi,xpos,pituus) {
@@ -22,7 +22,7 @@ class Aita {
         this.yOffset = 0;
         this.kuva = {
             // puuaidan kuvan vasemman reunan x-koordinaatti taustat.png:ssä  on 1180
-            // kiviaidan kuvan vasemman reunan x-koordinaatti on 1335
+            // tiiliaidan kuvan vasemman reunan x-koordinaatti on 1335
             x: (this.tyyppi == 1) ? 1180 : 1335, 
             y: 0,
             leveys: pituus,
@@ -128,7 +128,8 @@ class Pelaaja {
         this.lakipiste = false;
         this.aidanTakana = false;
         this.vaihdetaanPuolta = false;
-        this.laskuri = 0;
+        this.hypynFramelaskuri = 0;
+        this.edellinenKuvarivi = 0;
         this.kuva.onload = () => {
             this.leveys = this.kuva.width / this.kuvanframet;
             this.korkeus = this.kuva.height / this.kuvarivienlkm; 
@@ -196,8 +197,20 @@ class Pelaaja {
         
         // Debug: montako framea näytetään hypyn aikana?
         if (this.hyppyKaynnissa) {
-            this.laskuri += 1;
-            console.log(this.laskuri);
+            
+            // Siirrytään kuvatiedostossa hyppyanimaation riville
+            if (this.hypynFramelaskuri > 2 && this.hypynFramelaskuri <= 30 && this.kuvarivi != 3) {
+                this.edellinenKuvarivi = this.kuvarivi;
+                this.kuvarivi = 3;
+            }
+            
+            if (this.hypynFramelaskuri > 30 && this.kuvarivi == 3) {
+                this.kuvarivi = this.edellinenKuvarivi;
+            }
+
+            this.hypynFramelaskuri += 1;
+            
+            //console.log(this.hypynFramelaskuri)
         }
 
 
@@ -229,8 +242,8 @@ class Pelaaja {
             this.vaihdetaanPuolta = false;
             this.lakipiste = false;
             this.nopeus.y = 0;
-
-            this.laskuri = 0;
+            
+            this.hypynFramelaskuri = 0;
         }
 
         this.piirra();
