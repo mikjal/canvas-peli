@@ -95,10 +95,10 @@ const hitboxes = [{a: 2, l:98},{a: 30, l:155}]
 const hahmot = [
     // dino-testi
     {
-        kuvatiedosto: 'Dino_Dead_10.png',
+        kuvatiedosto: 'dino_seisoo_10.png',
         animaatioFrameja: 10,
         xOffsetti: 50,
-        yOffsetit: [6,0,0,0,2],
+        yOffsetit: [3,0,0,0,2],
         hitbox: {a: 2, l: 98}
     },
     // poika
