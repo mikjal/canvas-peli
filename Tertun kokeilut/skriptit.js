@@ -1,5 +1,5 @@
 const img = new Image();
-img.src = './Dino_Dead_10.png';
+img.src = './Dino_seisoo_10.png';
 
 const aitaImg = new Image();
 aitaImg.src = 'tiiliaita.png';
