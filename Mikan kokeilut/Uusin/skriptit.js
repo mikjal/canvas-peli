@@ -8,8 +8,8 @@ taustakuva.src = 'taustat.png';
 
 let taustat = [], vanha = 0, painovoima = 0.5, hahmoid = 0, pistemaara = 0, pistelisays = 50;
 // radan aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3= tiiliaidan pääty
-// HUOM! 2 jälkeen aina 3 että tiiliaita päättyy siististi!
-let aitaelementit =  [0,0,1,1,2,2,3,1,1,2,3,1,2,3,1];
+// HUOM! Alkuun aina 3 kpl nollaa ja 2 jälkeen aina 3 että tiiliaita päättyy siististi!
+let aitaelementit =  [0,0,0,1,1,1,1,1,1,1,1,1,1,2,2,3,1,1,2,3,1,2,3,1];
 let aidat = [];
 // "aitaelementtien" leveydet (tyhjä = 300, puuaita = 142, tiiliaita = 220, tiiliaidan pääty = 29)
 const elementtienpituudet = [300, 142, 220, 29];
@@ -94,13 +94,14 @@ const hitboxes = [{a: 2, l:98},{a: 30, l:155}]
 // Hahmojen mukaiset tiedot
 const hahmot = [
     // dino-testi
+    /*
     {
         kuvatiedosto: 'dino_seisoo_10.png',
         animaatioFrameja: 10,
         xOffsetti: 50,
         yOffsetit: [3,0,0,0,2],
         hitbox: {a: 2, l: 98}
-    },
+    }, */
     // poika
     {
         kuvatiedosto: 'poika.png',
@@ -116,7 +117,24 @@ const hahmot = [
         xOffsetti: 0,
         yOffsetit: [18,16,16,14,4],
         hitbox: {a: 30, l: 155}
+    },
+    // dino
+    {
+        kuvatiedosto: 'dino.png',
+        animaatioFrameja: 10,
+        xOffsetti: 20,
+        yOffsetit: [3,2,2,0,2],
+        hitbox: {a: 30, l: 155}
+    },
+    // joulupukki
+    {
+        kuvatiedosto: 'joulupukki.png',
+        animaatioFrameja: 10,
+        xOffsetti: 20,
+        yOffsetit: [3,2,2,0,2],
+        hitbox: {a: 30, l: 155}
     }
+    
 ]
 
 class Pelaaja {
@@ -131,7 +149,7 @@ class Pelaaja {
         //this.yOffsets = [18,16,16,14,4]; // kissa
         //this.yOffsets = [2,0,0,0,2]; // poika
         this.xOffset = hahmot[id].xOffsetti;
-        this.kuvarivienlkm = 1; // Montako animaatioriviä kuvatiedostossa on?
+        this.kuvarivienlkm = 5; // Montako animaatioriviä kuvatiedostossa on?
         this.kuvarivi = 0; // Mitä animaatio-"riviä" käytetään
         this.hyppyKaynnissa = false;
         this.hitbox =
@@ -397,7 +415,8 @@ window.onload = () => {
         }
 
         if (evnt.key == 'c' || evnt.key == 'C') {
-            hahmoid = (hahmoid+1 < hahmot.length)
+            hahmoid = (hahmoid+1 < hahmot.length) ? hahmoid += 1 : 0;
+            pelaaja.vaihdaHahmo(hahmoid);
         }
 
 
