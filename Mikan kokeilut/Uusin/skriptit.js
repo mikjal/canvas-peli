@@ -6,7 +6,7 @@ ctx.imageSmoothingQuality = 'medium';
 const taustakuva = new Image();
 taustakuva.src = 'taustat.png';
 
-let taustat = [], vanha = 0, painovoima = 0.5, vasenreunaX = 0, pistemaara = 0, pistelisays = 50;
+let taustat = [], vanha = 0, painovoima = 0.5, hahmoid = 0, pistemaara = 0, pistelisays = 50;
 // radan aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3= tiiliaidan pääty
 // HUOM! 2 jälkeen aina 3 että tiiliaita päättyy siististi!
 let aitaelementit =  [0,0,1,1,2,2,3,1,1,2,3,1,2,3,1];
@@ -89,47 +89,63 @@ aitaelementit.forEach((arvo) => {
     edellinen = arvo;
 });
 
+// Hahmojen "hitboxit" (a: alkaa, l: loppuu), 0 = poika, 1 = kissa
+const hitboxes = [{a: 2, l:98},{a: 30, l:155}]
+// Hahmojen mukaiset tiedot
+const hahmot = [
+    // dino-testi
+    {
+        kuvatiedosto: 'Dino_Dead_10.png',
+        animaatioFrameja: 10,
+        xOffsetti: 50,
+        yOffsetit: [6,0,0,0,2],
+        hitbox: {a: 2, l: 98}
+    },
+    // poika
+    {
+        kuvatiedosto: 'poika.png',
+        animaatioFrameja: 15,
+        xOffsetti: 50,
+        yOffsetit: [2,0,0,0,2],
+        hitbox: {a: 2, l: 98}
+    },
+    // kissa
+    {
+        kuvatiedosto: 'kissa.png',
+        animaatioFrameja: 10,
+        xOffsetti: 0,
+        yOffsetit: [18,16,16,14,4],
+        hitbox: {a: 30, l: 155}
+    }
+]
+
 class Pelaaja {
-    constructor(kuvatiedosto, framejakuvassa) {
+    constructor(id) {
+        console.log(hahmot[id]);
         this.kuva = new Image();
         this.haluttufps = 30;
-        this.kuvanframet = framejakuvassa;
+        this.kuvanframet = hahmot[id].animaatioFrameja;
         this.framekerroin = this.haluttufps / this.kuvanframet;
         this.nykyinenFrame = 0;
-        //this.yOffsets = [16,14,14,14]; // kissa
-        this.yOffsets = [2,0,0,0,2]; // poika
-        this.xOffset = 50;
-        this.kuvarivienlkm = 5; // Montako animaatioriviä kuvatiedostossa on?
+        this.yOffsets = hahmot[id].yOffsetit;
+        //this.yOffsets = [18,16,16,14,4]; // kissa
+        //this.yOffsets = [2,0,0,0,2]; // poika
+        this.xOffset = hahmot[id].xOffsetti;
+        this.kuvarivienlkm = 1; // Montako animaatioriviä kuvatiedostossa on?
         this.kuvarivi = 0; // Mitä animaatio-"riviä" käytetään
         this.hyppyKaynnissa = false;
-        this.hitbox = [ 
-                { // paikallaan
-                    alkaa: 0,
-                    paattyy: 0
-                },
-                { // kävelee
-                    alkaa: 4,
-                    paattyy: 85
-                },
-                { // juoksee
-                    alkaa: 10,
-                    paattyy: 105
-                },
-                { // hyppää
-                    alkaa: 2,
-                    paattyy: 96
-                },
-                { // kaatuu
-                    alkaa: 0,
-                    paattyy: 0
+        this.hitbox =
+                {
+                    alkaa: hahmot[id].hitbox.a,
+                    paattyy: hahmot[id].hitbox.l
                 }
-            ]   
         //    0,85,105,96,0
         this.lakipiste = false;
         this.aidanTakana = false;
         this.vaihdetaanPuolta = false;
         this.hypynFramelaskuri = 0;
         this.edellinenKuvarivi = 0;
+        this.saaPiirtaa = false;
         this.kuva.onload = () => {
             this.leveys = this.kuva.width / this.kuvanframet;
             this.korkeus = this.kuva.height / this.kuvarivienlkm; 
@@ -137,8 +153,9 @@ class Pelaaja {
                 x: Math.round(canvas.width / 2 - this.leveys / 2 + this.xOffset),
                 y: canvas.height-this.korkeus
             }
+            this.saaPiirtaa = true;
         }
-        this.kuva.src = kuvatiedosto;
+        this.kuva.src = hahmot[id].kuvatiedosto;
         this.nopeus = {
             x: 0,
             y: 0
@@ -149,43 +166,66 @@ class Pelaaja {
         }
     }
 
+    vaihdaHahmo(id) {
+        this.saaPiirtaa = false;
+        this.kuvanframet = hahmot[id].animaatioFrameja;
+        this.framekerroin = this.haluttufps / this.kuvanframet;
+        this.yOffsets = hahmot[id].yOffsetit;
+        this.xOffset = hahmot[id].xOffsetti;
+        this.hitbox =
+                {
+                    alkaa: hahmot[id].hitbox.a,
+                    paattyy: hahmot[id].hitbox.l
+                }
+        this.kuva.onload = () => {
+            this.leveys = this.kuva.width / this.kuvanframet;
+            this.korkeus = this.kuva.height / this.kuvarivienlkm; 
+            this.piirtopaikka = {
+                x: Math.round(canvas.width / 2 - this.leveys / 2 + this.xOffset),
+                y: canvas.height-this.korkeus
+            }
+            this.saaPiirtaa = true;
+        }
+        this.kuva.src = hahmot[id].kuvatiedosto;
+    }
+
     piirra() {
  
-        /* piirretään samaa framea useampaan kertaan peräkkäin että saadaan siitä sekunnin pituinen (15fps --> 30fps) */
-        let piirrettavaFrame = Math.floor(this.nykyinenFrame / this.framekerroin); 
+        if (this.saaPiirtaa) {
+            /* piirretään samaa framea useampaan kertaan peräkkäin että saadaan siitä sekunnin pituinen (15fps --> 30fps) */
+            let piirrettavaFrame = Math.floor(this.nykyinenFrame / this.framekerroin); 
 
-        ctx.drawImage(this.kuva,
-            piirrettavaFrame*this.leveys,
-            this.kuvarivi*this.korkeus,
-            this.leveys,
-            this.korkeus,
-            this.piirtopaikka.x,
-            this.piirtopaikka.y-this.yOffsets[this.kuvarivi]+this.paikka.y,
-            this.leveys,
-            this.korkeus
-        );
+            ctx.drawImage(this.kuva,
+                piirrettavaFrame*this.leveys,
+                this.kuvarivi*this.korkeus,
+                this.leveys,
+                this.korkeus,
+                this.piirtopaikka.x,
+                this.piirtopaikka.y-this.yOffsets[this.kuvarivi]+this.paikka.y,
+                this.leveys,
+                this.korkeus
+            );
 
-        this.nykyinenFrame = (this.nykyinenFrame < this.haluttufps-1) ? this.nykyinenFrame += 1 : this.nykyinenFrame = 0;
+            this.nykyinenFrame = (this.nykyinenFrame < this.haluttufps-1) ? this.nykyinenFrame += 1 : this.nykyinenFrame = 0;
 
-        /*
-        if (this.hitbox[this.kuvarivi].paattyy != 0) {
-           ctx.globalAlpha = 0.2;
-           ctx.fillStyle = 'red';
-           ctx.fillRect(
-            this.piirtopaikka.x+this.hitbox[this.kuvarivi].alkaa,
-            this.piirtopaikka.y-this.yOffsets[this.kuvarivi]+this.paikka.y,
-            this.hitbox[this.kuvarivi].paattyy-this.hitbox[this.kuvarivi].alkaa,
-            this.korkeus
-           );
-           ctx.globalAlpha = 1.0;
+            if (this.kuvarivi == 3) {
+            ctx.globalAlpha = 0.2;
+            ctx.fillStyle = 'red';
+            ctx.fillRect(
+                this.piirtopaikka.x+this.hitbox.alkaa,
+                this.piirtopaikka.y-this.yOffsets[this.kuvarivi]+this.paikka.y,
+                this.hitbox.paattyy-this.hitbox.alkaa,
+                this.korkeus
+            );
+            ctx.globalAlpha = 1.0;
+            }
         }
-        */
     }
 
     tarkastaOsuma() {
         let osumat = 0;
         aidat.forEach((aita) => {
-            if (aita.osuuko(this.piirtopaikka.x+this.hitbox[this.kuvarivi].alkaa,this.piirtopaikka.x+this.hitbox[this.kuvarivi].paattyy)) {
+            if (aita.osuuko(this.piirtopaikka.x+this.hitbox.alkaa,this.piirtopaikka.x+this.hitbox.paattyy)) {
                 osumat += 1;
             }
         });
@@ -216,7 +256,7 @@ class Pelaaja {
 
         if (this.nopeus.x != 0) pistelisays -= 0.2;
 
-        vasenreunaX = this.paikka.x - this.piirtopaikka.x;
+        //vasenreunaX = this.paikka.x - this.piirtopaikka.x;
 
         // Nopeuden vaikutus
         this.paikka.x += this.nopeus.x; 
@@ -255,8 +295,8 @@ class Pelaaja {
     }
 }
 
-const pelaaja = new Pelaaja('poika.png',15);
-//const pelaaja = new Pelaaja('kissa-juoksee2.png',10);
+let pelaaja = new Pelaaja(0);
+//const pelaaja = new Pelaaja(1);
 
 class Tausta {
     constructor(x,y,leveys,korkeus,yOffset,nopeuskerroin) {
@@ -356,6 +396,11 @@ window.onload = () => {
             }
         }
 
+        if (evnt.key == 'c' || evnt.key == 'C') {
+            hahmoid = (hahmoid+1 < hahmot.length)
+        }
+
+
     });
 
     animoi();
@@ -381,7 +426,7 @@ function animoi(aika) {
                 tausta.piirra(pelaaja.nopeus.x);
             });
 
-            // Aita ja pelaajan hahamo
+            // Aita ja pelaajan hahmo
             if (pelaaja.aidanTakana == true) {
                 pelaaja.paivita();
                 //aidat[0].paivita();

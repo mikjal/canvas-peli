@@ -27,7 +27,7 @@ body {
 .aloitusteksti h3 {
     padding: 0 200px;
     position: absolute;
-    /*font-family: 'Permanent Marker', sans-serif;*/
+    /* font-family: 'Permanent Marker', sans-serif; */
     /*font-family: 'Vina Sans', sans-serif;*/
     /*font-family: 'Dancing Script', cursive;*/
     /*font-family: 'Rowdies', sans-serif;*/
@@ -47,14 +47,15 @@ body {
 .aloitusteksti h2 {
     padding: 80px 200px;
 
-    /*font-family: 'Permanent Marker', sans-serif;*/
-    /*font-family: 'Vina Sans', sans-serif;*/
-    /*font-family: 'Dancing Script', cursive;*/
-    /*font-family: 'Rowdies', sans-serif;*/
-    /*font-family: 'Tourney', sans-serif;*/
-    /*font-family: 'Kaushan Script', cursive;*/
-    /*font-family: 'Fredericka the Great', serif;*/
-    /*font-family: 'Rye', serif;*/
+/*    font-family: 'Permanent Marker', sans-serif; */
+/*    
+    font-family: 'Vina Sans', sans-serif;
+    font-family: 'Dancing Script', cursive;
+    font-family: 'Rowdies', sans-serif;
+    font-family: 'Tourney', sans-serif;
+    font-family: 'Kaushan Script', cursive;
+    font-family: 'Fredericka the Great', serif;
+    font-family: 'Rye', serif; */
     font-family: 'Henny Penny', serif;
     font-size: 40px;
     text-align: center;
