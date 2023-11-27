@@ -1,5 +1,5 @@
 const img = new Image();
-img.src = './dino_hyppii_10kuvaa.png';
+img.src = './dino_juoksee.png';
 
 const aitaImg = new Image();
 aitaImg.src = 'tiiliaita.png';
