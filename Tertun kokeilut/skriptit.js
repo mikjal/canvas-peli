@@ -2,7 +2,7 @@ const img = new Image();
 img.src = './kissa-juoksee.png';
 
 const aitaImg = new Image();
-aitaImg.src = 'tiiliaita3.png';
+aitaImg.src = 'tiiliaita.png';
 
 const puuImg = new Image();
 puuImg.src = 'puut.png';

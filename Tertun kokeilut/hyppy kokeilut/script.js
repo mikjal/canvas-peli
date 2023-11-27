@@ -34,7 +34,7 @@ const characterSprite = {
 };
 
 const fenceImg = new Image();
-fenceImg.src = 'tiiliaita.png';
+fenceImg.src = 'aita-80.png';
 
 
 const character = {
