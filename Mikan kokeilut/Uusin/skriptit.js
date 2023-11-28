@@ -9,7 +9,7 @@ taustakuva.src = 'taustat.png';
 let taustat = [], vanha = 0, painovoima = 0.5, hahmoid = 0, pistemaara = 0, pistelisays = 50;
 // radan aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3= tiiliaidan pääty
 // HUOM! Alkuun aina 3 kpl nollaa ja 2 jälkeen aina 3 että tiiliaita päättyy siististi!
-let aitaelementit =  [0,0,0,1,1,1,1,1,1,1,1,1,1,2,2,3,1,1,2,3,1,2,3,1];
+let aitaelementit =  [0,0,0,1,1,2,2,3,1,1,1,1,1,1,2,2,3,1,1,2,3,1,2,3,1,1,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3];
 let aidat = [];
 // "aitaelementtien" leveydet (tyhjä = 300, puuaita = 142, tiiliaita = 220, tiiliaidan pääty = 29)
 const elementtienpituudet = [220, 142, 220, 29];
@@ -119,13 +119,23 @@ const hahmot = [
         xOffsetti: 20,
         yOffsetit: [3,2,2,0,2],
         hitbox: {a: 38, l: 200}
+    },
+    // ritari
+/*
+    {
+        kuvatiedosto: 'ritari.png',
+        animaatioFrameja: 10,
+        xOffsetti: 40,
+        yOffsetit: [3,2,2,0,2],
+        hitbox: {a: 38, l: 200}
     }
+    */
+    
     
 ]
 
 class Pelaaja {
     constructor(id) {
-        console.log(hahmot[id]);
         this.kuva = new Image();
         this.haluttufps = 30;
         this.kuvanframet = hahmot[id].animaatioFrameja;
@@ -144,9 +154,11 @@ class Pelaaja {
         this.lakipiste = false;
         this.aidanTakana = false;
         this.vaihdetaanPuolta = false;
-        this.hypynFramelaskuri = 0;
+        this.framelaskuri = 0;
         this.edellinenKuvarivi = 0;
         this.saaPiirtaa = false;
+        this.kaatuu = false;
+        this.seis = false; // Game Over
         this.kuva.onload = () => {
             // Määritetään hahmon kuvaan liittyviä ominaisuuksia vasta kun kuva on latautunut
             this.leveys = this.kuva.width / this.kuvanframet;
@@ -189,6 +201,10 @@ class Pelaaja {
             this.saaPiirtaa = true;
         }
         this.kuva.src = hahmot[id].kuvatiedosto;
+        this.kaatuu = false;
+        pistemaara = 0;
+        pistelisays = 50;
+        this.seis = false;
     }
 
     piirra() {
@@ -208,7 +224,10 @@ class Pelaaja {
                 this.korkeus
             );
 
-            this.nykyinenFrame = (this.nykyinenFrame < this.haluttufps-1) ? this.nykyinenFrame += 1 : this.nykyinenFrame = 0;
+            if (!this.seis) {
+                this.nykyinenFrame = (this.nykyinenFrame < this.haluttufps-1) ? this.nykyinenFrame += 1 : this.nykyinenFrame = 0;
+            }
+            
 
             if (this.kuvarivi == 3) {
             ctx.globalAlpha = 0.2;
@@ -231,7 +250,8 @@ class Pelaaja {
                 osumat += 1;
             }
         });
-        document.querySelector('#kaatuu').innerText = (osumat == 0) ? 'Ei' : 'Kyllä';
+        //document.querySelector('#kaatuu').innerText = (osumat == 0) ? 'Ei' : 'Kyllä';
+        return (osumat == 0) ? false : true;
 
     }
 
@@ -241,58 +261,77 @@ class Pelaaja {
         if (this.hyppyKaynnissa) {
             
             // Siirrytään kuvatiedostossa hyppyanimaation riville
-            if (this.hypynFramelaskuri > 2 && this.hypynFramelaskuri <= 30 && this.kuvarivi != 3) {
+            if (this.framelaskuri > 2 && this.framelaskuri <= 30 && this.kuvarivi != 3) {
                 this.edellinenKuvarivi = this.kuvarivi;
                 this.kuvarivi = 3;
             }
             
-            if (this.hypynFramelaskuri > 30 && this.kuvarivi == 3) {
+            if (this.framelaskuri > 30 && this.kuvarivi == 3) {
                 this.kuvarivi = this.edellinenKuvarivi;
             }
 
-            this.hypynFramelaskuri += 1;
+            this.framelaskuri += 1;
             
-            //console.log(this.hypynFramelaskuri)
+            //console.log(this.framelaskuri)
         }
 
 
-        if (this.nopeus.x != 0) pistelisays -= 0.2;
+        if (this.kaatuu && this.kuvarivi == 4) {
+            // kaatuu
+            
+            if (this.framelaskuri == 28) {
+                this.seis = true;
+                this.nopeus.x = 0;
+            } else {
+                this.framelaskuri += 1;
+                this.nopeus.x = (this.framelaskuri < 8) ? 3 : (this.framelaskuri < 16) ? 2 : (this.framelaskuri < 24) ? 1 : 0;
+                this.paikka.x += this.nopeus.x; 
 
-        //vasenreunaX = this.paikka.x - this.piirtopaikka.x;
-
-        // Nopeuden vaikutus
-        this.paikka.x += this.nopeus.x; 
-        this.paikka.y += this.nopeus.y;
-
-        // Nopeus y-suunnassa muuttuu painovoiman verran, jos pelaajan y on jotain muuta kuin nolla
-        let edellinen = this.nopeus.y;
-        this.nopeus.y = (this.paikka.y != 0) ? this.nopeus.y+painovoima : 0;
-
-        // Lakipiste eli onko hyppy korkeimmillaan?
-        if (edellinen < 0 && this.nopeus.y >= 0) {
-            this.lakipiste = true;
-            // Vaihdetaanko puolta?
-            //this.aidanTakana = (this.vaihdetaanPuolta == true) ? !this.aidanTakana : this.aidanTakana;
-            if (this.vaihdetaanPuolta) {
-                this.aidanTakana = !this.aidanTakana;
-                pistelisays = 50;
             }
-        }
-        // Ollaanko "maan" tasolla?
-        if (this.paikka.y >= 0 && this.hyppyKaynnissa) {
-            this.hyppyKaynnissa = false;
-            this.vaihdetaanPuolta = false;
-            this.lakipiste = false;
-            this.nopeus.y = 0;
-            
-            this.hypynFramelaskuri = 0;
+        } else {
+            if (this.nopeus.x != 0) pistelisays -= 0.2;
+
+            // Nopeuden vaikutus
+            this.paikka.x += this.nopeus.x; 
+            this.paikka.y += this.nopeus.y;
+    
+            // Nopeus y-suunnassa muuttuu painovoiman verran, jos pelaajan y on jotain muuta kuin nolla
+            let edellinen = this.nopeus.y;
+            this.nopeus.y = (this.paikka.y != 0) ? this.nopeus.y+painovoima : 0;
+    
+            // Lakipiste eli onko hyppy korkeimmillaan?
+            if (edellinen < 0 && this.nopeus.y >= 0) {
+                this.lakipiste = true;
+                // Vaihdetaanko puolta?
+                if (this.vaihdetaanPuolta) {
+                    if (this.tarkastaOsuma()) {
+                        this.kaatuu = true;
+                    } else {
+                        this.aidanTakana = !this.aidanTakana;
+                        pistelisays = 50;
+                    }
+                }
+            }
+            // Ollaanko "maan" tasolla?
+            if (this.paikka.y >= 0 && this.hyppyKaynnissa) {
+                this.hyppyKaynnissa = false;
+                this.vaihdetaanPuolta = false;
+                this.lakipiste = false;
+                this.nopeus.y = 0;
+                
+                this.framelaskuri = 0;
+                if (this.kaatuu) {
+                    this.kuvarivi = 4;
+                    this.nykyinenFrame = 0;
+                    this.nopeus.x = 3;
+                }
+            }
+
+            if (this.nopeus.x != 0) pistemaara += pistelisays;
+    
         }
 
         this.piirra();
-
-        this.tarkastaOsuma();
-
-        if (this.nopeus.x != 0) pistemaara += pistelisays;
 
     }
 }
@@ -406,7 +445,6 @@ window.onload = () => {
             pelaaja.vaihdaHahmo(hahmoid);
         }
 
-
     });
 
     animoi();
@@ -449,13 +487,25 @@ function animoi(aika) {
             lahinTausta.piirra(pelaaja.nopeus.x);
 
             let luku = Math.round(pistemaara / 10);
-            let pmaara = (luku < 0) ? '0' : luku.toString();
+            let pmaara;
+
+            if (luku < 0) {
+                pmaara = '0';
+                pistemaara = 0;
+                pelaaja.kaatuu = true;
+                pelaaja.kuvarivi = 4;
+                pelaaja.framelaskuri = 0;
+                pelaaja.nykyinenFrame = 0;
+                pelaaja.nopeus.x = 3;
+            } else {
+                pmaara = luku.toString();
+            }
 
             while (pmaara.length < 6) {
                 pmaara = '0' + pmaara;
             }
 
-            ctx.fillStyle = (pistelisays > 0) ? 'black' : 'red';
+            ctx.fillStyle = (pistelisays > 0) ? 'green' : 'red';
             ctx.font = '32px Arial';
             ctx.fillText(pmaara,canvas.width/2-40,32);
 
