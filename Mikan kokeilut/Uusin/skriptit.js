@@ -12,7 +12,7 @@ let taustat = [], vanha = 0, painovoima = 0.5, hahmoid = 0, pistemaara = 0, pist
 let aitaelementit =  [0,0,0,1,1,1,1,1,1,1,1,1,1,2,2,3,1,1,2,3,1,2,3,1];
 let aidat = [];
 // "aitaelementtien" leveydet (tyhjä = 300, puuaita = 142, tiiliaita = 220, tiiliaidan pääty = 29)
-const elementtienpituudet = [300, 142, 220, 29];
+const elementtienpituudet = [220, 142, 220, 29];
 // jos samaa elementtiä on monta peräkkäin, montako pikseliä seuraava kuva menee edellisen päälle?
 const elementtienoffsetit = [0,2,0,0]; 
 
@@ -39,7 +39,6 @@ class Aita {
 
     piirra() {
         this.piirtopaikka = this.paikka.x+pelaaja.piirtopaikka.x-pelaaja.paikka.x;
-        //let pelaajankohta = pelaaja.paikka.x-this.paikka.x;
         
         // tarkastetaan onko aidan osa näkyvissä, jos on piirretään se
         if (this.piirtopaikka+this.kuva.leveys >= 0 && this.piirtopaikka <= canvas.width) {
@@ -53,7 +52,6 @@ class Aita {
 
         }
         
-        //console.log(pelaajankohta,this.paikka.x);
     }
 
     paivita() {
@@ -65,7 +63,6 @@ class Aita {
         if (!this.nakyvilla || this.tyyppi == 1) {
             return false
         } else {
-            //console.log(pelaajanHahmoAlkaa,pelaajanHahmoPaattyy,this.piirtopaikka,this.piirtopaikka+this.kuva.leveys);
             if (pelaajanHahmoPaattyy >= this.piirtopaikka && pelaajanHahmoAlkaa <= this.piirtopaikka+this.kuva.leveys)
                 return true;
         }
@@ -89,26 +86,15 @@ aitaelementit.forEach((arvo) => {
     edellinen = arvo;
 });
 
-// Hahmojen "hitboxit" (a: alkaa, l: loppuu), 0 = poika, 1 = kissa
-const hitboxes = [{a: 2, l:98},{a: 30, l:155}]
 // Hahmojen mukaiset tiedot
 const hahmot = [
-    // dino-testi
-    /*
-    {
-        kuvatiedosto: 'dino_seisoo_10.png',
-        animaatioFrameja: 10,
-        xOffsetti: 50,
-        yOffsetit: [3,0,0,0,2],
-        hitbox: {a: 2, l: 98}
-    }, */
     // poika
     {
-        kuvatiedosto: 'poika.png',
-        animaatioFrameja: 15,
-        xOffsetti: 50,
-        yOffsetit: [2,0,0,0,2],
-        hitbox: {a: 2, l: 98}
+        kuvatiedosto: 'poika.png', // tiedostonimi
+        animaatioFrameja: 15, // montako animaatioframea yhdellä kuvatiedoston rivillä (rivejä aina 5)
+        xOffsetti: 50, // Hahmon säätäminen x-suunnassa
+        yOffsetit: [2,0,0,0,2], // Hahmon säätäminen y-suunnassa eri animaatioissa (paikallaan, kävely, juoksu, hyppy, kaatuminen)
+        hitbox: {a: 2, l: 98} // x-suunnan hitboxin offset: a: alkaa, l: loppuu
     },
     // kissa
     {
@@ -122,9 +108,9 @@ const hahmot = [
     {
         kuvatiedosto: 'dino.png',
         animaatioFrameja: 10,
-        xOffsetti: 20,
+        xOffsetti: 45,
         yOffsetit: [3,2,2,0,2],
-        hitbox: {a: 30, l: 155}
+        hitbox: {a: 14, l: 193}
     },
     // joulupukki
     {
@@ -132,7 +118,7 @@ const hahmot = [
         animaatioFrameja: 10,
         xOffsetti: 20,
         yOffsetit: [3,2,2,0,2],
-        hitbox: {a: 30, l: 155}
+        hitbox: {a: 38, l: 200}
     }
     
 ]
@@ -146,8 +132,6 @@ class Pelaaja {
         this.framekerroin = this.haluttufps / this.kuvanframet;
         this.nykyinenFrame = 0;
         this.yOffsets = hahmot[id].yOffsetit;
-        //this.yOffsets = [18,16,16,14,4]; // kissa
-        //this.yOffsets = [2,0,0,0,2]; // poika
         this.xOffset = hahmot[id].xOffsetti;
         this.kuvarivienlkm = 5; // Montako animaatioriviä kuvatiedostossa on?
         this.kuvarivi = 0; // Mitä animaatio-"riviä" käytetään
@@ -157,7 +141,6 @@ class Pelaaja {
                     alkaa: hahmot[id].hitbox.a,
                     paattyy: hahmot[id].hitbox.l
                 }
-        //    0,85,105,96,0
         this.lakipiste = false;
         this.aidanTakana = false;
         this.vaihdetaanPuolta = false;
@@ -165,6 +148,7 @@ class Pelaaja {
         this.edellinenKuvarivi = 0;
         this.saaPiirtaa = false;
         this.kuva.onload = () => {
+            // Määritetään hahmon kuvaan liittyviä ominaisuuksia vasta kun kuva on latautunut
             this.leveys = this.kuva.width / this.kuvanframet;
             this.korkeus = this.kuva.height / this.kuvarivienlkm; 
             this.piirtopaikka = {
@@ -341,19 +325,22 @@ class Tausta {
 
         // Lasketaan uusi piirtopaikka: 
         // nykyisestä piirtopaikasta vähennetään pelaajan nopeus*nopeuskerroin --> kuva siirtyy vasemmalle
-        this.piirtopaikka.x -= Math.round(this.nopeuskerroin*pelaajanNopeus);
-        
+        //this.piirtopaikka.x -= Math.round(this.nopeuskerroin*pelaajanNopeus);
+
+        this.piirtopaikka.x -= this.nopeuskerroin*pelaajanNopeus;
+        let piirtopaikka = Math.round(this.piirtopaikka.x)
+
         // Loppuuko kuvasta leveys, pitääkö piirtää toinen kuva ensimmäisen perään?
-        if (this.kuva.leveys + this.piirtopaikka.x < canvas.width) {
+        if (this.kuva.leveys + piirtopaikka < canvas.width) {
             // Kyllä, piirretään toinen kuva ensimmäisen perään
             ctx.drawImage(taustakuva,
                 this.kuva.x,this.kuva.y,this.kuva.leveys,this.kuva.korkeus, // Source
-                this.kuva.leveys + this.piirtopaikka.x, this.piirtopaikka.y, this.kuva.leveys, this.kuva.korkeus // Destination
+                this.kuva.leveys + piirtopaikka, this.piirtopaikka.y, this.kuva.leveys, this.kuva.korkeus // Destination
             );
             // Onko toinen kuva saavuttanut vasemman reunan, voidaanko piirtää taas vain yhtä kuvaa?
-            if (this.kuva.leveys + this.piirtopaikka.x <= 0) {
+            if (this.kuva.leveys + piirtopaikka <= 0) {
                 // Kyllä, "nollataan" piirtopaikka ja piirretään jatkossa vain yhtä kuvaa
-                this.piirtopaikka.x = this.kuva.leveys + this.piirtopaikka.x;
+                this.piirtopaikka.x = this.kuva.leveys + piirtopaikka;
             }
     
         }
@@ -448,7 +435,6 @@ function animoi(aika) {
             // Aita ja pelaajan hahmo
             if (pelaaja.aidanTakana == true) {
                 pelaaja.paivita();
-                //aidat[0].paivita();
                 aidat.forEach((aita) => {
                     aita.paivita();
                 });
@@ -456,7 +442,6 @@ function animoi(aika) {
                 aidat.forEach((aita) => {
                     aita.paivita();
                 });
-                //aidat[0].paivita();
                 pelaaja.paivita();
             }
 

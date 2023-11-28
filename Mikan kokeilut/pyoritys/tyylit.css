@@ -3,14 +3,36 @@
     100% { transform: rotate(360deg); }
 }
 
-#spin {
+#spin1 {
     width: 20px;
     height: 20px;
-    /* border: 4px solid green; */
     border-bottom: 4px solid black;
     border-top: 4px solid black;
     border-left: 4px solid lightgrey;
     border-right: 4px solid lightgrey;
+    border-radius: 50%;
+    animation: pyoritys 1s linear infinite;
+}
+
+#spin2 {
+    width: 20px;
+    height: 20px;
+    /* border: 4px solid green; */
+    border-bottom: 4px solid black;
+    border-top: 4px solid lightgrey;
+    border-left: 4px solid black;
+    border-right: 4px solid lightgrey;
+    border-radius: 50%;
+    animation: pyoritys 1s linear infinite;
+}
+
+#spin3 {
+    width: 20px;
+    height: 20px;
+    border-bottom: 4px solid green;
+    border-top: 4px solid green;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
     border-radius: 50%;
     animation: pyoritys 1s linear infinite;
 }
