@@ -16,12 +16,16 @@
         if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) { document.write('<h1>Internet Exloreria ei tueta! Internet Explorer is not supported! </h1>'); window.stop(); }
     </script>
 
-    <canvas id="kanvaasi" width="1200" height="700">
+    <canvas id="kanvaasi" width="1024" height="576">
         <p>Selaimesi ei tuo canvas-elementtiä</p>
     </canvas>
-    
-    <div id="odota">
-        <h1>Odota hetki...</h1>
+
+    <div class="container">
+        <div id="odota">
+            <h1>Odota hetki...</h1>
+        </div>
+        <div id="spin1">  
+        </div>
     </div>
 
     <script src="js/skriptit.js"></script>
