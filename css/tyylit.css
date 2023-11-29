@@ -5,13 +5,46 @@ body {
 #kanvaasi {
     display: block;
     margin: auto;
+    background-color: rgb(218, 194, 241);
+}
+
+#odota {
+    display: none;
+    text-align: center;
+    position: fixed;
+    top: 22%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+#spin1 {
+    width: 40px;
+    height: 40px;
+    border-bottom: 4px solid black;
+    border-top: 4px solid black;
+    border-left: 4px solid lightgrey;
+    border-right: 4px solid lightgrey;
+    border-radius: 50%;
+    animation: pyoritys 1s linear infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 20%;
+    left: 33%; /* Muutettu sijainti vasemmalle */
+    transform: translate(-50%, -50%);
+}
+
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 h1 {
-    position: absolute;
-    padding-top: 25px;
-    top: 258px;
-    left: 412px;
     background-color: rgb(135, 206, 235);
     border: 6px solid rgb(85, 114, 1);
     color:rgb(92, 124, 211);
@@ -29,21 +62,4 @@ h1 {
     100% { transform: rotate(360deg); }
 }
 
-#spin1 {
-    width: 40px;
-    height: 40px;
-    border-bottom: 4px solid black;
-    border-top: 4px solid black;
-    border-left: 4px solid lightgrey;
-    border-right: 4px solid lightgrey;
-    border-radius: 50%;
-    animation: pyoritys 1s linear infinite;
-}
-
-.container {
-    display: flex;
-    justify-content: center;
-
-    height: 100vh; /* Tämä pitää sisällön keskellä myös pystysuunnassa */
-  }
 
