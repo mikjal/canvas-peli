@@ -7,7 +7,7 @@ body {
     margin: auto;
     background-color: rgb(218, 194, 241);
 }
-
+/*
 #odota {
     display: none;
     text-align: center;
@@ -32,7 +32,7 @@ body {
     align-items: center;
     position: fixed;
     top: 20%;
-    left: 33%; /* Muutettu sijainti vasemmalle */
+    left: 33%; 
     transform: translate(-50%, -50%);
 }
 
@@ -56,10 +56,43 @@ h1 {
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
     box-shadow: 8px 8px rgb(147, 148, 148);
 }
+*/
+
+#odota {
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, -340px);
+    width: 350px;
+    height: 70px;
+    background-color: rgb(135, 206, 235);
+    border: 6px solid rgb(85, 114, 1);
+    border-radius: 10px;
+    box-shadow: 8px 8px rgb(147, 148, 148);
+    text-align: center;
+}
 
 @keyframes pyoritys {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
+#spin {
+    display: inline-block;
+    margin: 16px 0 0 0;
+    width: 25px;
+    height: 25px;
+    border: 5px solid;
+    border-color: rgb(135, 206, 235) rgb(92, 124, 211);
+    border-radius: 50%;
+    animation: pyoritys 1s linear infinite;
+}
 
+#odota h1 {
+    display: inline-block;
+    font-size: 40px;
+    margin-left: 16px;
+    margin-top: 0;
+    color:rgb(92, 124, 211);
+    vertical-align: middle;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
