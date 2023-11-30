@@ -5,7 +5,12 @@ body {
 #kanvaasi {
     display: block;
     margin: auto;
+    /*
     background-color: rgb(218, 194, 241);
+    */
+    border: 1px solid black;
+    margin-top: 10px;
+    opacity: 0;
 }
 /*
 #odota {
