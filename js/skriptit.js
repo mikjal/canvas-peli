@@ -1,13 +1,11 @@
 let vanhaAika = 0; // Ruudunpäivityksen ajastukseen
+let kuvatKaytettavissa = [false], aloitusajat = [0], d = new Date();
 
 // Tautakuvat
 const taustakuvat = new Image();
-taustakuvat.onload = () => {
-    console.log('Taustakuvien tiedosto ladattu.');
-}
 taustakuvat.src = '../kuvat/taustat.png';
 
-// Odotetaan että sivu on latautunut 
+// Odotetaan että sivu on latautunut ja kaikki sen resurssit on latautunut
 window.onload = () => {
     document.getElementById('odota').style.display = 'none';
     document.getElementById('kanvaasi').style.opacity = 1;
