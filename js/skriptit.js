@@ -331,7 +331,7 @@ class Lintu2 {
         this.animFrameja = 16; // Vaihda tason määrä
         this.nykyinenFrame = 0;
         this.leveys = lintuImg2.width / this.animFrameja;
-        this.korkeus = 590; // Pienennetty korkeus
+        this.korkeus = 390; // Pienennetty korkeus
         this.paikka = {
             x: -210,  // Aseta linnun alku sivun vasempaan reunaan
             y: canvas.height - this.korkeus
@@ -360,7 +360,7 @@ class Lintu2 {
         this.paikka.x += this.nopeus.x;
 
         // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
-        if (this.paikka.x + this.leveys > canvas.width +150) {
+        if (this.paikka.x + this.leveys > canvas.width + 1000) { // lukua muuttamalla lintu pysyy näkymättömissä
             this.paikka.x = 0;
         }
     }
