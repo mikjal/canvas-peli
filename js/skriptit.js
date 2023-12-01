@@ -361,7 +361,7 @@ class Lintu2 {
 
         // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
         if (this.paikka.x + this.leveys > canvas.width + 1000) { // lukua muuttamalla lintu pysyy näkymättömissä
-            this.paikka.x = 0;
+            this.paikka.x = -210;
         }
     }
 }
