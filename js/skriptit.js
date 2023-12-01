@@ -8,7 +8,16 @@ let pistemaara = 0, pistelisays = 0, painovoima = 0.5;
 const taustakuvat = new Image();
 taustakuvat.src = '../kuvat/taustat.png';
 
-let taustat = [] // taustakuvia varten
+const lintuImg2 = new Image();
+lintuImg2.onload = () =>{
+    console.log('lintu2 tiedosto ladattu')
+}
+lintuImg2.onerror = function() {
+    console.error('Virhe kuvaa ladattaessa:', lintuImg2.src);
+}
+lintuImg2.src = '../kuvat/mustatLinnut2.png';
+
+let taustat = [], lintu2 // taustakuvia varten
 
 // Hahmojen mukaiset tiedot
 const hahmot = [
@@ -226,6 +235,8 @@ window.onload = () => {
 
     lahinTausta = new Tausta(0,1418,1920,25,-canvas.height,1.1); // keltainen maa
 
+    lintu2 = new Lintu2(); // musta lintu
+
     animoi();
 }
 
@@ -274,6 +285,47 @@ class Tausta {
     }
 }
 
+//musta lintu
+class Lintu2 {
+    constructor() {
+        this.animFrameja = 16; // Vaihda tason määrä
+        this.nykyinenFrame = 0;
+        this.leveys = lintuImg2.width / this.animFrameja;
+        this.korkeus = 590; // Pienennetty korkeus
+        this.paikka = {
+            x: -210,  // Aseta linnun alku sivun vasempaan reunaan
+            y: canvas.height - this.korkeus
+        };
+        this.nopeus = {
+            x: 4,  // Aseta linnun vaakasuuntainen nopeus
+            y: 0
+        };
+    }
+
+    piirra() {
+        ctx.drawImage(lintuImg2,
+            this.nykyinenFrame * this.leveys, /* source x */
+            0, /* source y */
+            this.leveys,
+            this.korkeus,
+            this.paikka.x, /* destination x */
+            this.paikka.y, /* destination y */
+            this.leveys / 2,
+            this.korkeus / 2);
+        this.nykyinenFrame = (this.nykyinenFrame < this.animFrameja - 1) ? this.nykyinenFrame += 1 : 0;
+    }
+
+    paivita() {
+        // Vaakasuuntainen liike
+        this.paikka.x += this.nopeus.x;
+
+        // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
+        if (this.paikka.x + this.leveys > canvas.width +150) {
+            this.paikka.x = 0;
+        }
+    }
+}
+
 // Canvasin animointi
 function animoi(aika) {
     // Kutsutaan tätä samaa funktiota ennen seuraavaa ruudun "maalausta"
@@ -303,7 +355,8 @@ function animoi(aika) {
             /* piirretään lähin tausta, keltainen maa */
             lahinTausta.piirra(pelaaja.nopeus.x);
 
-
+            lintu2.paivita();
+            lintu2.piirra();
 
         }
     }
