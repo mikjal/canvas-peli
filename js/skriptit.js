@@ -3,6 +3,20 @@ const ctx = canvas.getContext("2d");
 
 let vanhaAika = 0; // Ruudunpäivityksen ajastukseen
 let pistemaara = 0, pistelisays = 0, painovoima = 0.5;
+let tila = 'a'; // a = aloitusruutu, o = ohjeet, p = peli käynnissä
+
+// Tarkistetaan tukeeko laite kosketusta
+if (navigator.maxTouchPoints > 1) {
+    // Kosketuksessa käytettävien nappuloiden sijoittelu
+    let canvasPaikka = canvas.getBoundingClientRect();
+    document.querySelectorAll('.nappulat').forEach ((ele, ndx) => {
+        ele.style.left = canvasPaikka.left+5 + 'px';
+        ele.style.top = canvasPaikka.top + canvas.height / 2 * ndx + 'px';
+        ele.style.height = canvas.height / 2 + 'px';
+        ele.style.width = canvas.width + 'px';
+        ele.disabled = false;
+    })
+}
 
 // Taustakuvat
 const taustakuvat = new Image();
@@ -188,8 +202,7 @@ class Pelaaja {
             }
 
             // Ollaanko "maan" tasolla?
-            // TARKASTA! oli alunperin this.paikka.y >= 0 && this.hyppyKaynnissa
-            if (this.paikka.y <= 0 && this.hyppyKaynnissa) {
+            if (this.paikka.y >= 0 && this.hyppyKaynnissa) {
                 this.hyppyKaynnissa = false;
                 this.vaihdetaanPuolta = false;
                 this.nopeus.y = 0;
@@ -216,6 +229,29 @@ class Pelaaja {
 
 let pelaaja = new Pelaaja(0);
 
+// nappuloiden ja nappien käsittelijä
+function painettu(nappi) {
+    
+    switch (nappi) {
+        case 'ArrowUp':
+            if (!pelaaja.hyppyKaynnissa) {
+                pelaaja.hyppyKaynnissa = true;
+                pelaaja.nopeus.y = -8;
+                // vaihdetaan puolta jos pelaaja ei ole aidan takana, muussa tapauksessa ei vaihdeta puolta
+                pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == false) ? true : false;
+            }
+        break;
+        case 'ArrowDown':
+            if (!pelaaja.hyppyKaynnissa) {
+                pelaaja.hyppyKaynnissa = true;
+                pelaaja.nopeus.y = -8;
+                // vaihdetaan puolta jos pelaaja on aidan takana, muussa tapauksessa ei vaihdeta puolta
+                pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == true) ? true : false;
+            }
+        break;
+    }
+}
+
 // Odotetaan että sivu on latautunut ja kaikki sen resurssit on latautunut
 window.onload = () => {
     document.getElementById('odota').style.display = 'none';
@@ -236,6 +272,10 @@ window.onload = () => {
     lahinTausta = new Tausta(0,1418,1920,25,-canvas.height,1.1); // keltainen maa
 
     lintu2 = new Lintu2(); // musta lintu
+
+    window.addEventListener('keydown', (eve) => {
+        painettu(eve.key);
+    }) // end window.addEventListener
 
     animoi();
 }
