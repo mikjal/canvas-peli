@@ -3,15 +3,21 @@ body {
 }
 
 #kanvaasi {
-    display: block;
-    margin: auto;
-    /*
-    background-color: rgb(218, 194, 241);
-    */
+/*    display: block; */
+/*    margin: auto;  */
     border: 1px solid black;
     margin-top: 10px;
     opacity: 0;
 }
+
+#container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+}
+
 /*
 #odota {
     display: none;
@@ -106,7 +112,105 @@ h1 {
     position: fixed;
     left: 0;
     top: 0;
-    opacity: 0;
+    opacity: 0.5;
     height: 0;
-    width: 0;
+    width: 100vw;
 }
+
+#info {
+    position: fixed;
+    display: none;
+}
+
+/*
+Breakpoint Setting	For Device
+max-width 420px	Smaller devices
+max-width 600px	Phones
+min-width 600px	Tablets and Large Phones
+min-width 768px	Tablets
+min-width 992px	Laptops and Desktops
+min-width 1200px	Monitors, Desktops
+
+410+ 0,4
+512+ 0,5
+614+ 0,6
+717+ 0,7
+819+ 0,8
+922+ 0,9
+1024 1
+*/
+
+@media only screen and (max-width: 511.99px) {
+    #kanvaasi {
+        transform: scale(0.4);
+        transform-origin: 50% 0;
+    }
+    
+}
+
+@media only screen and (min-width: 512px) and (max-width: 613.99px) {
+    #kanvaasi {
+        transform: scale(0.5);
+        transform-origin: 50% 0;
+    }
+    
+}
+
+@media only screen and (min-width: 614px) and (max-width: 716.99px) {
+    #kanvaasi {
+        transform: scale(0.6);
+        transform-origin: 50% 0;
+    }
+    
+}
+
+@media only screen and (min-width: 717px) and (max-width: 818.99px) {
+    #kanvaasi {
+        transform: scale(0.7);
+        transform-origin: 50% 0;
+    }
+    
+}
+
+@media only screen and (min-width: 819px) and (max-width: 921.99px) {
+    #kanvaasi {
+        transform: scale(0.8);
+        transform-origin: 50% 0;
+    }
+    
+}
+
+@media only screen and (min-width: 922px) and (max-width: 1023.99px) {
+    #kanvaasi {
+        transform: scale(0.9);
+        transform-origin: 50% 0;
+    }
+    
+}
+
+
+/*
+@media only screen and (max-width: 819px) and (min-width: 614px) {
+    #kanvaasi {
+        transform: scale(0.6);
+        transform-origin: 50% 0;
+    }
+    
+}
+
+@media only screen and (max-width: 1024px) and (min-width: 820px) {
+    #kanvaasi {
+        transform: scale(0.8);
+        transform-origin: 50% 0;
+    }
+    
+}
+*/
+
+@media only screen and (min-width: 1540px) {
+    #kanvaasi {
+        transform: scale(1.5);
+        transform-origin: 50% 0;
+    }
+}
+

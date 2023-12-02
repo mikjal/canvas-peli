@@ -3,20 +3,12 @@ const ctx = canvas.getContext("2d");
 
 let vanhaAika = 0; // Ruudunpäivityksen ajastukseen
 let pistemaara = 0, pistelisays = 0, painovoima = 0.5;
-let tila = 'a'; // a = aloitusruutu, o = ohjeet, p = peli käynnissä
+let tila = 'a'; // m = mobiili-info, a = aloitusruutu, o = ohjeet, p = peli käynnissä
 
 // Tarkistetaan tukeeko laite kosketusta
-if (navigator.maxTouchPoints > 1) {
-    // Kosketuksessa käytettävien nappuloiden sijoittelu
-    let canvasPaikka = canvas.getBoundingClientRect();
-    document.querySelectorAll('.nappulat').forEach ((ele, ndx) => {
-        ele.style.left = canvasPaikka.left+5 + 'px';
-        ele.style.top = canvasPaikka.top + canvas.height / 2 * ndx + 'px';
-        ele.style.height = canvas.height / 2 + 'px';
-        ele.style.width = canvas.width + 'px';
-        ele.disabled = false;
-    })
-}
+if (navigator.maxTouchPoints > 1) tila = 'm';
+
+tila = 'm';
 
 // Taustakuvat
 const taustakuvat = new Image();
@@ -252,6 +244,7 @@ function painettu(nappi) {
     }
 }
 
+// == ONLOAD ===========================================================================================
 // Odotetaan että sivu on latautunut ja kaikki sen resurssit on latautunut
 window.onload = () => {
     document.getElementById('odota').style.display = 'none';
@@ -276,6 +269,29 @@ window.onload = () => {
     window.addEventListener('keydown', (eve) => {
         painettu(eve.key);
     }) // end window.addEventListener
+
+    if (tila == 'm') { // Kosketusta tukevan laitteen info
+        // Kosketuksessa käytettävien nappuloiden sijoittelu
+        let canvasPaikka = canvas.getBoundingClientRect();
+        document.querySelectorAll('.nappulat').forEach ((ele, ndx) => {
+            //ele.style.left = Math.round(canvasPaikka.left) + 'px';
+            //ele.style.left = 0;
+            ele.style.top = canvasPaikka.top + canvasPaikka.height / 2 * ndx + 'px';
+            ele.style.height = canvasPaikka.height / 2 + 'px';
+            //ele.style.width = window.innerWidth + 'px';
+            ele.disabled = false;
+        })
+
+        window.onresize = () => {
+            let canvasPaikka = canvas.getBoundingClientRect();
+            document.querySelectorAll('.nappulat').forEach ((ele, ndx) => {
+                ele.style.top = canvasPaikka.top + canvasPaikka.height / 2 * ndx + 'px';
+                ele.style.height = canvasPaikka.height / 2 + 'px';
+            })
+    
+        }
+
+    }
 
     animoi();
 }
