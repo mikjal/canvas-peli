@@ -117,20 +117,21 @@ h1 {
 }
 
 #info {
-    position: fixed;
+    position: absolute;
+    box-sizing: border-box;
     display: none;
     background-color: white;
     top: 11px;
     width: 1024px;
-    height: 576px;
+/*    height: 576px; */
     opacity: 0.9;
     margin: 0;
-    padding: 0;
+    padding: 0.5em 0.2em;
 }
 
 #info h1 {
     text-align: center;
-    font-size: 3.5em;
+    font-size: 2.5em;
     margin: 0 0 0.5em 0;
 }
 
@@ -138,8 +139,9 @@ h1 {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 3.5em;
+    font-size: 2.5em;
     padding: 0.2em 1em;
+    margin-bottom: 0.5em;
 }
 /*
 Breakpoint Setting	For Device
@@ -169,7 +171,6 @@ min-width 1200px	Monitors, Desktops
         opacity: 0;
     }
 
-/*
 @media only screen and (max-width: 511.99px) {
     .skaalaus {
         transform: scale(0.4);

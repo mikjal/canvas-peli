@@ -23,7 +23,7 @@ lintuImg2.src = '../kuvat/mustatLinnut2.png';
 
 let taustat = [], lintu2 // taustakuvia varten
 
-
+/*
 // Skaalaus
 function laskeSkaala() {
     // Lasketaan suhdeluvut levydelle ja korkeudelle
@@ -40,6 +40,7 @@ function laskeSkaala() {
         ele.style.transformOrigin = '50% 0';
     });
 }
+*/
 /*
 laskeSkaala();
 */
@@ -277,7 +278,7 @@ function laskenappienpaikka() {
             //ele.disabled = false;
         })
     }
-    laskeSkaala(); 
+    /* laskeSkaala();  */
 }
 
 function sallinapit() {
@@ -296,7 +297,7 @@ window.onload = () => {
     document.getElementById('odota').style.display = 'none';
     document.getElementById('kanvaasi').style.opacity = 1;
     
-    laskeSkaala(); 
+    /* laskeSkaala();  */
     // Tarkistetaan tukeeko laite kosketusta
     if (navigator.maxTouchPoints > 0) {
         touch = true;
