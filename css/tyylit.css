@@ -1,21 +1,17 @@
 body {
     margin: 0;
+    padding: 0;
 }
 
-#kanvaasi {
-/*    display: block; */
-/*    margin: auto;  */
-    border: 1px solid black;
-    margin-top: 10px;
-    opacity: 0;
-}
 
 #container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100vw;
+    margin: 0;
+    padding: 0;
 }
 
 /*
@@ -70,9 +66,10 @@ h1 {
 */
 
 #odota {
-    position: relative;
+    position: fixed;
     left: 50%;
-    transform: translate(-50%, -340px);
+    top: 20%;
+    transform: translate(-50%, -50%);
     width: 350px;
     height: 70px;
     background-color: rgb(135, 206, 235);
@@ -93,7 +90,7 @@ h1 {
     width: 25px;
     height: 25px;
     border: 5px solid;
-    border-color: rgb(135, 206, 235) rgb(92, 124, 211);
+    border-color: rgb(92, 124, 211) transparent;
     border-radius: 50%;
     animation: pyoritys 1s linear infinite;
 }
@@ -120,8 +117,29 @@ h1 {
 #info {
     position: fixed;
     display: none;
+    background-color: white;
+    top: 11px;
+    width: 1024px;
+    height: 576px;
+    opacity: 0.9;
+    margin: 0;
+    padding: 0;
 }
 
+#info h1 {
+    text-align: center;
+    font-size: 4vh;
+    margin: 0 0 1vh 0;
+}
+
+#info button {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 1vh;
+    font-size: 4vh;
+    padding: 1vh 2vw;
+}
 /*
 Breakpoint Setting	For Device
 max-width 420px	Smaller devices
@@ -139,33 +157,41 @@ min-width 1200px	Monitors, Desktops
 922+ 0,9
 1024 1
 */
-
+#kanvaasi {
+    /*    display: block; */
+    /*    margin: auto;  */
+        border: 1px solid black;
+        margin-top: 10px;
+        opacity: 0;
+    }
+    
 @media only screen and (max-width: 511.99px) {
-    #kanvaasi {
+    .skaalaus {
         transform: scale(0.4);
         transform-origin: 50% 0;
     }
-    
+   
 }
 
 @media only screen and (min-width: 512px) and (max-width: 613.99px) {
-    #kanvaasi {
+    .skaalaus {
         transform: scale(0.5);
         transform-origin: 50% 0;
+
     }
-    
+
 }
 
 @media only screen and (min-width: 614px) and (max-width: 716.99px) {
-    #kanvaasi {
+    .skaalaus {
         transform: scale(0.6);
         transform-origin: 50% 0;
     }
-    
+
 }
 
 @media only screen and (min-width: 717px) and (max-width: 818.99px) {
-    #kanvaasi {
+    .skaalaus {
         transform: scale(0.7);
         transform-origin: 50% 0;
     }
@@ -173,7 +199,7 @@ min-width 1200px	Monitors, Desktops
 }
 
 @media only screen and (min-width: 819px) and (max-width: 921.99px) {
-    #kanvaasi {
+    .skaalaus {
         transform: scale(0.8);
         transform-origin: 50% 0;
     }
@@ -181,7 +207,7 @@ min-width 1200px	Monitors, Desktops
 }
 
 @media only screen and (min-width: 922px) and (max-width: 1023.99px) {
-    #kanvaasi {
+    .skaalaus {
         transform: scale(0.9);
         transform-origin: 50% 0;
     }
@@ -208,7 +234,7 @@ min-width 1200px	Monitors, Desktops
 */
 
 @media only screen and (min-width: 1540px) {
-    #kanvaasi {
+    .skaalaus {
         transform: scale(1.5);
         transform-origin: 50% 0;
     }

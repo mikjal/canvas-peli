@@ -3,12 +3,11 @@ const ctx = canvas.getContext("2d");
 
 let vanhaAika = 0; // Ruudunpäivityksen ajastukseen
 let pistemaara = 0, pistelisays = 0, painovoima = 0.5;
-let tila = 'a'; // m = mobiili-info, a = aloitusruutu, o = ohjeet, p = peli käynnissä
+let tila = 'a'; // a = aloitusruutu, o = ohjeet, p = peli käynnissä
+let touch = false;
 
 // Tarkistetaan tukeeko laite kosketusta
-if (navigator.maxTouchPoints > 1) tila = 'm';
-
-tila = 'm';
+if (navigator.maxTouchPoints > 1) touch = true;
 
 // Taustakuvat
 const taustakuvat = new Image();
@@ -244,11 +243,42 @@ function painettu(nappi) {
     }
 }
 
+function laskenappienpaikka() {
+    // Kosketuksessa käytettävien nappuloiden sijoittelu
+    let canvasPaikka = canvas.getBoundingClientRect();
+    document.querySelectorAll('.nappulat').forEach ((ele, ndx) => {
+        //ele.style.left = Math.round(canvasPaikka.left) + 'px';
+        //console.log(ele.style.left);
+        //ele.style.left = 0;
+        ele.style.top = canvasPaikka.top + canvasPaikka.height / 2 * ndx + 'px';
+        ele.style.height = canvasPaikka.height / 2 + 'px';
+        //ele.style.width = window.innerWidth + 'px';
+        //ele.disabled = false;
+    })
+
+}
+
+function sallinapit() {
+    laskenappienpaikka();
+    document.querySelectorAll('.nappulat').forEach ((ele) => {
+        if (ele.disabled) ele.disabled = false;
+    })
+    document.querySelector('#info').style.display = 'none';
+
+}
+
 // == ONLOAD ===========================================================================================
 // Odotetaan että sivu on latautunut ja kaikki sen resurssit on latautunut
 window.onload = () => {
     document.getElementById('odota').style.display = 'none';
     document.getElementById('kanvaasi').style.opacity = 1;
+    if (touch) {
+        document.querySelector('#info').style.display = 'block';
+        laskenappienpaikka();
+
+        window.addEventListener('resize',laskenappienpaikka);
+        screen.orientation.addEventListener('change', laskenappienpaikka);
+    } // skrollatessa muuttuu!
 
     // luodaan Tausta-luokan mukaiset oliot kaikille taustoille, piirretään järjestyksessä ensimmäisestä viimeiseen
     taustat = [
@@ -270,28 +300,17 @@ window.onload = () => {
         painettu(eve.key);
     }) // end window.addEventListener
 
-    if (tila == 'm') { // Kosketusta tukevan laitteen info
-        // Kosketuksessa käytettävien nappuloiden sijoittelu
-        let canvasPaikka = canvas.getBoundingClientRect();
-        document.querySelectorAll('.nappulat').forEach ((ele, ndx) => {
-            //ele.style.left = Math.round(canvasPaikka.left) + 'px';
-            //ele.style.left = 0;
-            ele.style.top = canvasPaikka.top + canvasPaikka.height / 2 * ndx + 'px';
-            ele.style.height = canvasPaikka.height / 2 + 'px';
-            //ele.style.width = window.innerWidth + 'px';
-            ele.disabled = false;
-        })
 
+            /*
         window.onresize = () => {
             let canvasPaikka = canvas.getBoundingClientRect();
             document.querySelectorAll('.nappulat').forEach ((ele, ndx) => {
                 ele.style.top = canvasPaikka.top + canvasPaikka.height / 2 * ndx + 'px';
                 ele.style.height = canvasPaikka.height / 2 + 'px';
             })
-    
         }
+            */
 
-    }
 
     animoi();
 }
