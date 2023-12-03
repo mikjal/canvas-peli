@@ -1,14 +1,16 @@
 body {
     margin: 0;
     padding: 0;
+    width: 100vw;
+    height: 100vh;
 }
-
 
 #container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 100%;
     width: 100vw;
     margin: 0;
     padding: 0;
@@ -106,7 +108,7 @@ h1 {
 }
 
 .nappulat {
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
     opacity: 0.5;
@@ -128,17 +130,16 @@ h1 {
 
 #info h1 {
     text-align: center;
-    font-size: 4vh;
-    margin: 0 0 1vh 0;
+    font-size: 3.5em;
+    margin: 0 0 0.5em 0;
 }
 
 #info button {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
-    margin-top: 1vh;
-    font-size: 4vh;
-    padding: 1vh 2vw;
+    font-size: 3.5em;
+    padding: 0.2em 1em;
 }
 /*
 Breakpoint Setting	For Device
@@ -158,19 +159,22 @@ min-width 1200px	Monitors, Desktops
 1024 1
 */
 #kanvaasi {
-    /*    display: block; */
-    /*    margin: auto;  */
+        /*
+        display: block; 
+        margin: auto;  
+        */
+        /* position: fixed; */
         border: 1px solid black;
         margin-top: 10px;
         opacity: 0;
     }
-    
+
+/*
 @media only screen and (max-width: 511.99px) {
     .skaalaus {
         transform: scale(0.4);
         transform-origin: 50% 0;
     }
-   
 }
 
 @media only screen and (min-width: 512px) and (max-width: 613.99px) {
@@ -214,7 +218,6 @@ min-width 1200px	Monitors, Desktops
     
 }
 
-
 /*
 @media only screen and (max-width: 819px) and (min-width: 614px) {
     #kanvaasi {
@@ -232,7 +235,7 @@ min-width 1200px	Monitors, Desktops
     
 }
 */
-
+/*
 @media only screen and (min-width: 1540px) {
     .skaalaus {
         transform: scale(1.5);
@@ -240,3 +243,4 @@ min-width 1200px	Monitors, Desktops
     }
 }
 
+*/

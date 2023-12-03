@@ -1,13 +1,12 @@
 const canvas = document.querySelector('#kanvaasi');
 const ctx = canvas.getContext("2d");
+const canwidth = canvas.width, canheight = canvas.height;
+
 
 let vanhaAika = 0; // Ruudunpäivityksen ajastukseen
 let pistemaara = 0, pistelisays = 0, painovoima = 0.5;
 let tila = 'a'; // a = aloitusruutu, o = ohjeet, p = peli käynnissä
-let touch = false;
-
-// Tarkistetaan tukeeko laite kosketusta
-if (navigator.maxTouchPoints > 1) touch = true;
+let touch = false; // tukeeko laite kosketusta?
 
 // Taustakuvat
 const taustakuvat = new Image();
@@ -23,6 +22,27 @@ lintuImg2.onerror = function() {
 lintuImg2.src = '../kuvat/mustatLinnut2.png';
 
 let taustat = [], lintu2 // taustakuvia varten
+
+
+// Skaalaus
+function laskeSkaala() {
+    // Lasketaan suhdeluvut levydelle ja korkeudelle
+    let lev = (window.innerWidth-10) / canwidth, kor = (window.innerHeight-15) / canheight;
+    // Kumman mukaan säädetään skaala, leveyden vai korkeuden?
+    let skaala = (lev < kor) ? (Math.round(lev * 100)) / 100 : (Math.round(kor * 100)) / 100;
+    // Minimi on 0.35, maksimi 1.5
+    skaala = (skaala < 0.35) ? 0.35 : (skaala <= 1.5) ? skaala : 1.5;
+    console.log(window.innerWidth,window.innerHeight,skaala);
+
+    // Muutetaan kaikki skaalaus-luokan elementit käyttämään uutta arvoa
+    document.querySelectorAll('.skaalaus').forEach((ele) => {
+        ele.style.transform = 'scale('+skaala+')';
+        ele.style.transformOrigin = '50% 0';
+    });
+}
+/*
+laskeSkaala();
+*/
 
 // Hahmojen mukaiset tiedot
 const hahmot = [
@@ -76,8 +96,8 @@ class Pelaaja {
             this.leveys = this.kuva.width / this.kuvanFramet; // Yhden animaatioruudun leveys
             this.korkeus = this.kuva.height / 5; // Kaikissa kuvatiedostoissa on 5 eri "riviä" animaatioita
             this.piirtopaikka = { // hahmon piirtopaikka
-                x: Math.round(canvas.width / 2 - this.leveys / 2 + this.xOffset),
-                y: canvas.height - this.korkeus
+                x: Math.round(canwidth / 2 - this.leveys / 2 + this.xOffset),
+                y: canheight - this.korkeus 
             }
             this.saaPiirtaa = true;
         }
@@ -220,7 +240,7 @@ class Pelaaja {
 
 let pelaaja = new Pelaaja(0);
 
-// nappuloiden ja nappien käsittelijä
+// nappuloiden ja nappien käsittelijä 
 function painettu(nappi) {
     
     switch (nappi) {
@@ -244,18 +264,20 @@ function painettu(nappi) {
 }
 
 function laskenappienpaikka() {
-    // Kosketuksessa käytettävien nappuloiden sijoittelu
-    let canvasPaikka = canvas.getBoundingClientRect();
-    document.querySelectorAll('.nappulat').forEach ((ele, ndx) => {
-        //ele.style.left = Math.round(canvasPaikka.left) + 'px';
-        //console.log(ele.style.left);
-        //ele.style.left = 0;
-        ele.style.top = canvasPaikka.top + canvasPaikka.height / 2 * ndx + 'px';
-        ele.style.height = canvasPaikka.height / 2 + 'px';
-        //ele.style.width = window.innerWidth + 'px';
-        //ele.disabled = false;
-    })
-
+    if (touch) {
+        // Kosketuksessa käytettävien nappuloiden sijoittelu
+        let canvasPaikka = canvas.getBoundingClientRect();
+        document.querySelectorAll('.nappulat').forEach ((ele, ndx) => {
+            //ele.style.left = Math.round(canvasPaikka.left) + 'px';
+            //console.log(ele.style.left);
+            //ele.style.left = 0;
+            ele.style.top = canvasPaikka.top + canvasPaikka.height / 2 * ndx + 'px';
+            ele.style.height = canvasPaikka.height / 2 + 'px';
+            //ele.style.width = window.innerWidth + 'px';
+            //ele.disabled = false;
+        })
+    }
+    laskeSkaala(); 
 }
 
 function sallinapit() {
@@ -267,18 +289,23 @@ function sallinapit() {
 
 }
 
+
 // == ONLOAD ===========================================================================================
 // Odotetaan että sivu on latautunut ja kaikki sen resurssit on latautunut
 window.onload = () => {
     document.getElementById('odota').style.display = 'none';
     document.getElementById('kanvaasi').style.opacity = 1;
-    if (touch) {
+    
+    laskeSkaala(); 
+    // Tarkistetaan tukeeko laite kosketusta
+    if (navigator.maxTouchPoints > 0) {
+        touch = true;
         document.querySelector('#info').style.display = 'block';
         laskenappienpaikka();
+    }
 
-        window.addEventListener('resize',laskenappienpaikka);
-        screen.orientation.addEventListener('change', laskenappienpaikka);
-    } // skrollatessa muuttuu!
+    window.addEventListener('resize',laskenappienpaikka);
+    screen.orientation.addEventListener('change', laskenappienpaikka);
 
     // luodaan Tausta-luokan mukaiset oliot kaikille taustoille, piirretään järjestyksessä ensimmäisestä viimeiseen
     taustat = [
@@ -287,12 +314,12 @@ window.onload = () => {
         new Tausta(0,0,1024,288,0,0),
         // negatiivinen kuvan sijoittumistieto (y-koordinaatti )tulkitaan siten, että siitä vähennetään kuvan korkeus
         // -canvas.height+25 = canvasin korkeus - kuvan korkeus - 25 (25 on viimeksi piirrettävän "taustan" korkeus)
-        new Tausta(0,288,1920,400,-canvas.height+25,0.2), //harmaat rakennukset
-        new Tausta(0,688,1920,420,-canvas.height+25,0.4), //muut rakennukset
-        new Tausta(0,1108,1920,310,-canvas.height+25,0.6) //puut
+        new Tausta(0,288,1920,400,-canheight+25,0.2), //harmaat rakennukset
+        new Tausta(0,688,1920,420,-canheight+25,0.4), //muut rakennukset
+        new Tausta(0,1108,1920,310,-canheight+25,0.6) //puut 
     ];
 
-    lahinTausta = new Tausta(0,1418,1920,25,-canvas.height,1.1); // keltainen maa
+    lahinTausta = new Tausta(0,1418,1920,25,-canheight,1.1); // keltainen maa 
 
     lintu2 = new Lintu2(); // musta lintu
 
@@ -344,7 +371,7 @@ class Tausta {
         let piirtopaikka = Math.round(this.piirtopaikka.x)
 
         // Loppuuko kuvasta leveys, pitääkö piirtää toinen kuva ensimmäisen perään?
-        if (this.kuva.leveys + piirtopaikka < canvas.width) {
+        if (this.kuva.leveys + piirtopaikka < canwidth) { 
             // Kyllä, piirretään toinen kuva ensimmäisen perään
             ctx.drawImage(taustakuvat,
                 this.kuva.x,this.kuva.y,this.kuva.leveys,this.kuva.korkeus, // Source
@@ -369,7 +396,7 @@ class Lintu2 {
         this.korkeus = 390; // Pienennetty korkeus
         this.paikka = {
             x: -210,  // Aseta linnun alku sivun vasempaan reunaan
-            y: canvas.height - this.korkeus
+            y: canheight - this.korkeus 
         };
         this.nopeus = {
             x: 4,  // Aseta linnun vaakasuuntainen nopeus
@@ -395,7 +422,7 @@ class Lintu2 {
         this.paikka.x += this.nopeus.x;
 
         // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
-        if (this.paikka.x + this.leveys > canvas.width + 1000) { // lukua muuttamalla lintu pysyy näkymättömissä
+        if (this.paikka.x + this.leveys > canwidth + 1000) { // lukua muuttamalla lintu pysyy näkymättömissä
             this.paikka.x = -210;
         }
     }
@@ -417,7 +444,7 @@ function animoi(aika) {
 
             /* sininen taivas taustalla takimmaisena */
             ctx.fillStyle = 'skyblue';
-            ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillRect(0,0,canwidth,canheight); 
 
             /* piirretään kaikki taustat (paitsi katsojaa lähinnä oleva) siinä järjestyksessä kuin ne ovat arrayssa */
             taustat.forEach((tausta) => {
