@@ -565,7 +565,7 @@ class Lintu2 {
         this.animFrameja = 16; // Vaihda tason määrä
         this.nykyinenFrame = 0;
         this.leveys = lintuImg2.width / this.animFrameja;
-        this.korkeus = 390; // Pienennetty korkeus
+        this.korkeus = 290; // Pienennetty korkeus
         this.paikka = {
             x: -210,  // Aseta linnun alku sivun vasempaan reunaan
             y: canheight - this.korkeus 
@@ -618,10 +618,18 @@ function animoi(aika) {
             ctx.fillStyle = 'skyblue';
             ctx.fillRect(0,0,canwidth,canheight); 
 
-            /* piirretään kaikki taustat (paitsi katsojaa lähinnä oleva) siinä järjestyksessä kuin ne ovat arrayssa */
-            taustat.forEach((tausta) => {
-                tausta.piirra(pelaaja.nopeus.x);
-            });
+            taustat.forEach((tausta,indeksi) => {
+                taustat[0].piirra(pelaaja.nopeus.x);
+                taustat[1].piirra(pelaaja.nopeus.x);  
+                taustat[2].piirra(pelaaja.nopeus.x);
+ 
+             });
+             lintu2.paivita();
+             lintu2.piirra();
+ 
+             taustat.forEach((tausta,indeksi) => {
+                 taustat[3].piirra(pelaaja.nopeus.x);
+             });
 
             // Aitojen ja pelaajan hahmon piirtäminen
             // Onko hahmo aidan takana?
@@ -641,9 +649,6 @@ function animoi(aika) {
 
             /* piirretään lähin tausta, keltainen maa */
             lahinTausta.piirra(pelaaja.nopeus.x);
-
-            lintu2.paivita();
-            lintu2.piirra();
 
             if (tila == 'a') {
                 // aloitusruudun piirtäminen
