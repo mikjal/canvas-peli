@@ -4,9 +4,11 @@ const canwidth = canvas.width, canheight = canvas.height;
 
 
 let vanhaAika = 0; // Ruudunpäivityksen ajastukseen
-let pistemaara = 0, pistelisays = 0, painovoima = 0.5;
-let tila = 'a'; // a = aloitusruutu, o = ohjeet, p = peli käynnissä
+let pistemaara = 0, pistelisays = 50, painovoima = 0.5, hahmoid = 0;
+let tila = 'a'; // a = aloitusruutu, o = ohjeet, p = peli käynnissä, g = game over
 let touch = false; // tukeeko laite kosketusta?
+let aidat = []; // Aita-luokan oliot
+let fontOK = false;
 
 // Taustakuvat
 const taustakuvat = new Image();
@@ -22,6 +24,17 @@ lintuImg2.onerror = function() {
 lintuImg2.src = '../kuvat/mustatLinnut2.png';
 
 let taustat = [], lintu2 // taustakuvia varten
+
+// Fontit
+const hennyFontti = new FontFace('Henny Penny','url(https://fonts.gstatic.com/s/hennypenny/v17/wXKvE3UZookzsxz_kjGSfPQtvXI.woff2)');
+
+hennyFontti.load().then(() => {
+    document.fonts.add(hennyFontti);
+    fontOK = true;
+}, (err) => {
+    console.log(err);
+},
+);
 
 /*
 // Skaalaus
@@ -89,7 +102,7 @@ class Pelaaja {
         this.framekerroin = 30 / this.kuvanFramet; 
         this.nykyinenFrame = 0; // Mikä frame piirretään
         this.xOffset = hahmot[id].xOffsetti; // Hahmon kuvan säätäminen x-suunnassa
-        this.yOffsets = hahmot[id].yOffsetit; // Hahmon kuvan säätäminen eri animaatioissa y-suunnassa
+        this.yOffsetit = hahmot[id].yOffsetit; // Hahmon kuvan säätäminen eri animaatioissa y-suunnassa
         this.kuvarivi = 0; // Mitä "animaatiorivä" käytetään
         this.saaPiirtaa = false; // Milloin hahmon saa piirtää ja milloin ei (=hahmon kuvan latautuessa)
         // Määritetään hahmon kuvaan liittyviä ominaisuuksia vasta kun kuva on latautunut
@@ -138,7 +151,7 @@ class Pelaaja {
                 this.leveys,                    // Source: width
                 this.korkeus,                   // Source: height
                 this.piirtopaikka.x,            // Destination: x
-                this.piirtopaikka.y - this.yOffsets[this.kuvarivi] + this.paikka.y, // Destination: y
+                this.piirtopaikka.y - this.yOffsetit[this.kuvarivi] + this.paikka.y, // Destination: y
                 this.leveys,                    // Destination: width
                 this.korkeus                    // Destination: height
                 )
@@ -151,7 +164,13 @@ class Pelaaja {
     } // end piirra()
 
     tarkastaOsuma() {
-        return false;
+        let osuma = false;
+        aidat.forEach((aita) => {
+            if (aita.osuuko(this.piirtopaikka.x + this.hitbox.alkaa, this.piirtopaikka.x + this.hitbox.paattyy)) {
+                osuma = true;
+            }
+        })
+        return osuma;
     }
 
     paivita() {
@@ -237,30 +256,181 @@ class Pelaaja {
 
         this.piirra();
     } // End paivita()
+
+    vaihdaHahmo(id) {
+        this.saaPiirtaa = false;
+        this.kuvanFramet = hahmot[id].animaatioFrameja;
+        this.framekerroin = 30 / this.kuvanFramet;
+        this.yOffsetit = hahmot[id].yOffsetit;
+        this.xOffset = hahmot[id].xOffsetti;
+        this.hitbox = { alkaa: hahmot[id].hitbox.a, paattyy: hahmot[id].hitbox.l };
+        this.kuva.onload = () => {
+            this.leveys = this.kuva.width / this.kuvanFramet;
+            this.korkeus = this.kuva.height / 5;
+            this.piirtopaikka = { // hahmon piirtopaikka
+                x: Math.round(canwidth / 2 - this.leveys / 2 + this.xOffset),
+                y: canheight - this.korkeus 
+            };
+            this.saaPiirtaa = true;
+        }
+        this.kuva.src = hahmot[id].kuvatiedosto;
+        this.nollaa();
+    }
+
+    nollaa() {
+        pistelisays = 50;
+        pistemaara = 0;
+        this.kaatuu = false;
+        this.gameOver = false;
+    }
 } // end class Pelaaja
 
-let pelaaja = new Pelaaja(0);
+let pelaaja = new Pelaaja(hahmoid);
+
+class Aita {
+    constructor(aidanTyyppi, xPaikka, leveys) {
+        this.tyyppi = aidanTyyppi; // 1 = puuaita, 2 = tiiliaita, 3 = tiiliaidan pääty
+        this.kuva = {
+            // puuaidan kuvan vasemman reunan x-koordinaatti taustat.png:ssä  on 1180
+            // tiiliaidan kuvan vasemman reunan x-koordinaatti on 1335
+            // kun tyyppi = 1 kuva alkaa koordinaateista (1180, 0)
+            // Kun tyyppi on joitain muuta kuin 1, kuva alkaa koordinaateista (1335, 0)
+            x: (this.tyyppi == 1) ? 1180 : 1335,
+            y: 0, // molemmat aidankuvat alkavat ylälaidasta
+            leveys: leveys,
+            // puuaidan korkeus on 80 ja tiiliaidan 118
+            korkeus: (this.tyyppi == 1) ? 80 : 118
+        }
+        this.paikka = {
+            x: xPaikka,
+            y: canvas.height - this.kuva.korkeus - 25 
+        }
+        this.nakyvilla = false; // onko aita näkyvillä?
+        this.piirtopaikka = 0; // todelilnen piirtopaikka ruudulle
+    } // end constructor
+
+    piirra() {
+        // lasketaan todellinen piirtopaikka
+        this.piirtopaikka = this.paikka.x + pelaaja.piirtopaikka.x - pelaaja.paikka.x;
+
+        // tarkistetaan onko aita näkyvillä, jos on piirretään se
+        if (this.piirtopaikka + this.kuva.leveys >= 0 && this.piirtopaikka <= canvas.width) {
+            //if (this.tyyppi != 0) {
+                if (pelaaja.kaatuu && pelaaja.aidanTakana) ctx.globalAlpha = 0.7;
+                ctx.drawImage(taustakuvat,
+                    this.kuva.x, // Source
+                    this.kuva.y,
+                    this.kuva.leveys,
+                    this.kuva.korkeus,
+                    this.piirtopaikka, // Destination
+                    this.paikka.y,
+                    this.kuva.leveys,
+                    this.kuva.korkeus);
+                ctx.globalAlpha = 1;
+                    this.nakyvilla = true;
+            //} 
+        } else this.nakyvilla = false;
+    } // end piirra()
+
+    paivita() {
+        this.piirra();
+        this.x += pelaaja.nopeus.x;
+    }
+
+    osuuko(hahmonAlku, hahmonLoppu) {
+        if (!this.nakyvilla || this.tyyppi == 1) {
+            return false
+        } else {
+            if (hahmonLoppu >= this.piirtopaikka && hahmonAlku <= this.piirtopaikka + this.kuva.leveys) {
+                return true
+            } else return false;
+        }
+    }
+
+} // end class Aita
+
+// Pelin aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3 = tiiliaidan pääty
+// HUOM! alussa 3 kpl nollaa ja kakkosen jälkeen aina kolmonen että tiiliaita päättyy siististi
+const aitaelementit = [0,0,0,1,1,2,2,3,0,1,1,1]
+// Aita-elementtien levydet: ei aitaa = 220, puuaita = 142, tiiliaita = 220, tiiliaidan pääty = 29
+const elementtienLeveydet = [220, 142, 220, 29];
+// Aita-elementtien x-offset eli jos samaa elementtiä on monta kertaa peräkkäin, paljonko seuraava elementti menee edellisen päälle
+const elementtienOffsetit = [0,2,0,0,0];
+// apumuuttujia
+let aKohta = 0, aEdellinen = 0;
+
+// täytetään aidat-array
+aitaelementit.forEach((arvo) => {
+    // Onko kysessä aitaelementti vai tyhjä tila?
+    if (arvo != 0) {
+        // onko lisättävä elementti sama kuin edellinen? Jos on, vähennetään offsetti
+        aKohta = (aEdellinen == arvo) ? aKohta - elementtienOffsetit[arvo] : aKohta;
+        // lisätään arrayhin uusi aita
+        aidat.push(new Aita(arvo,aKohta,elementtienLeveydet[arvo]));
+    } 
+    aKohta += elementtienLeveydet[arvo];
+    aEdellinen = arvo;
+});
 
 // nappuloiden ja nappien käsittelijä 
 function painettu(nappi) {
     
-    switch (nappi) {
-        case 'ArrowUp':
-            if (!pelaaja.hyppyKaynnissa) {
-                pelaaja.hyppyKaynnissa = true;
-                pelaaja.nopeus.y = -8;
-                // vaihdetaan puolta jos pelaaja ei ole aidan takana, muussa tapauksessa ei vaihdeta puolta
-                pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == false) ? true : false;
-            }
-        break;
-        case 'ArrowDown':
-            if (!pelaaja.hyppyKaynnissa) {
-                pelaaja.hyppyKaynnissa = true;
-                pelaaja.nopeus.y = -8;
-                // vaihdetaan puolta jos pelaaja on aidan takana, muussa tapauksessa ei vaihdeta puolta
-                pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == true) ? true : false;
-            }
-        break;
+    // alkuruutu
+    if (tila == 'a') {
+        switch (nappi) {
+            case 'ArrowUp':
+            case 'w':
+            case 'W':
+                    tila = 'p';
+                pelaaja.nopeus.x = 3;
+                break;
+            case 'ArrowDown':
+            case 's':
+            case 'S':
+                        hahmoid = (hahmoid+1 < hahmot.length) ? hahmoid += 1 : 0;
+                pelaaja.vaihdaHahmo(hahmoid);
+                break;
+        }
+    } else 
+    // ohjeruutu
+    if (tila == 'o') {
+        switch (nappi) {
+            case 'ArrowUp':
+                break;
+            case 'ArrowDown':
+                break;
+        }
+    } else 
+    // game over
+    if (tila == 'g') {
+        switch (nappi) {
+            case 'ArrowUp':
+                break;
+            case 'ArrowDown':
+                break;
+        }
+    } else 
+    // pelitila
+    if (tila == 'p') {
+        switch (nappi) {
+            case 'ArrowUp':
+                if (!pelaaja.hyppyKaynnissa) {
+                    pelaaja.hyppyKaynnissa = true;
+                    pelaaja.nopeus.y = -8;
+                    // vaihdetaan puolta jos pelaaja ei ole aidan takana, muussa tapauksessa ei vaihdeta puolta
+                    pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == false) ? true : false;
+                }
+            break;
+            case 'ArrowDown':
+                if (!pelaaja.hyppyKaynnissa) {
+                    pelaaja.hyppyKaynnissa = true;
+                    pelaaja.nopeus.y = -8;
+                    // vaihdetaan puolta jos pelaaja on aidan takana, muussa tapauksessa ei vaihdeta puolta
+                    pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == true) ? true : false;
+                }
+            break;
+        }
+    
     }
 }
 
@@ -292,8 +462,9 @@ function sallinapit() {
 
 
 // == ONLOAD ===========================================================================================
-// Odotetaan että sivu on latautunut ja kaikki sen resurssit on latautunut
+// Odotetaan että sivu ja kaikki sen resurssit on latautunut
 window.onload = () => {
+    console.log('onload');
     document.getElementById('odota').style.display = 'none';
     document.getElementById('kanvaasi').style.opacity = 1;
     
@@ -452,8 +623,21 @@ function animoi(aika) {
                 tausta.piirra(pelaaja.nopeus.x);
             });
 
-            pelaaja.paivita();
-            pelaaja.nopeus.x = 5;
+            // Aitojen ja pelaajan hahmon piirtäminen
+            // Onko hahmo aidan takana?
+            if (pelaaja.aidanTakana) {
+                // hahmo on aidan takana, piirretään se ensin
+                pelaaja.paivita();
+                aidat.forEach((aita) => {
+                    aita.paivita();
+                });
+            } else {
+                // hahmo ei ole aidan takana, piirretään aidat ensin
+                aidat.forEach((aita) => {
+                    aita.paivita();
+                });
+                pelaaja.paivita();
+            }
 
             /* piirretään lähin tausta, keltainen maa */
             lahinTausta.piirra(pelaaja.nopeus.x);
@@ -461,6 +645,41 @@ function animoi(aika) {
             lintu2.paivita();
             lintu2.piirra();
 
+            if (tila == 'a') {
+                // aloitusruudun piirtäminen
+                if (fontOK) {
+                    ctx.fillStyle = 'black';
+                    ctx.font = '32px "Henny Penny"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Terttu ja Mika', canwidth / 2, 35)
+                    ctx.fillText('esittävät pelin', canwidth / 2, 80)
+                    ctx.font = '48px "Henny Penny"';
+                    ctx.fillText('Mennään siitä mistä aita on matalin',canwidth / 2, 80+60);
+                }
+            } else
+            if (tila == 'p') {
+                let luku = Math.round(pistemaara / 10), pmaara;
+                if (luku < 0) {
+                    pistemaara = 0;
+                    luku = 0;
+                    pelaaja.kaatuu = true;
+                    pelaaja.kuvarivi = 4;
+                    pelaaja.framelaskuri = 0;
+                    pelaaja.nykyinenFrame = 0;
+                    pelaaja.nopeus.x = 3;
+                }
+                pmaara = luku.toString();
+
+                while (pmaara.length < 6) {
+                    pmaara = '0' + pmaara;
+                }
+
+                ctx.fillStyle = (pistelisays > 0) ? 'green' : 'red';
+                ctx.font = '32px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(pmaara,canwidth / 2, 32);
+
+            } // end pelitila
         }
     }
 }
