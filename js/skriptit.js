@@ -488,10 +488,9 @@ window.onload = () => {
         // -canvas.height+25 = canvasin korkeus - kuvan korkeus - 25 (25 on viimeksi piirrettävän "taustan" korkeus)
         new Tausta(0,288,1920,400,-canheight+25,0.2), //harmaat rakennukset
         new Tausta(0,688,1920,420,-canheight+25,0.4), //muut rakennukset
-        new Tausta(0,1108,1920,310,-canheight+25,0.6) //puut 
+        new Tausta(0,1108,1920,310,-canheight+25,0.6), //puut 
+        new Tausta(0,1418,1920,25,-canheight,1.1) // keltainen maa 
     ];
-
-    lahinTausta = new Tausta(0,1418,1920,25,-canheight,1.1); // keltainen maa 
 
     lintu2 = new Lintu2(); // musta lintu
 
@@ -618,18 +617,33 @@ function animoi(aika) {
             ctx.fillStyle = 'skyblue';
             ctx.fillRect(0,0,canwidth,canheight); 
 
+            // Piirretään taustat 0-2 kerran 
+            for(let i=0; i < 3; i++) {
+                taustat[i].piirra(pelaaja.nopeus.x);
+            }
+            
+            /* 
+            // Tämä piirtää kolme ensimmäistä taustaa 5 kertaa peräkkäin (koska taustat sisältää viisi eri taustaa)
             taustat.forEach((tausta,indeksi) => {
                 taustat[0].piirra(pelaaja.nopeus.x);
                 taustat[1].piirra(pelaaja.nopeus.x);  
                 taustat[2].piirra(pelaaja.nopeus.x);
  
              });
+
+             */
+
              lintu2.paivita();
              lintu2.piirra();
  
+             taustat[3].piirra(pelaaja.nopeus.x);
+
+             /*
+             // Tämä piirtää neljännen taustan 5 kertaa perääkäin
              taustat.forEach((tausta,indeksi) => {
                  taustat[3].piirra(pelaaja.nopeus.x);
              });
+             */
 
             // Aitojen ja pelaajan hahmon piirtäminen
             // Onko hahmo aidan takana?
@@ -648,7 +662,7 @@ function animoi(aika) {
             }
 
             /* piirretään lähin tausta, keltainen maa */
-            lahinTausta.piirra(pelaaja.nopeus.x);
+            taustat[4].piirra(pelaaja.nopeus.x);
 
             if (tila == 'a') {
                 // aloitusruudun piirtäminen
