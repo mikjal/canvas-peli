@@ -8,7 +8,7 @@ let pistemaara = 0, pistelisays = 50, painovoima = 0.5, hahmoid = 0;
 let tila = 'a'; // a = aloitusruutu, o = ohjeet, p = peli käynnissä, g = game over
 let touch = false; // tukeeko laite kosketusta?
 let aidat = []; // Aita-luokan oliot
-let fontOK = false;
+let hennyOK = false, abelOK = false;
 
 // Taustakuvat
 const taustakuvat = new Image();
@@ -27,10 +27,11 @@ let taustat = [], lintu2 // taustakuvia varten
 
 // Fontit
 const hennyFontti = new FontFace('Henny Penny','url(https://fonts.gstatic.com/s/hennypenny/v17/wXKvE3UZookzsxz_kjGSfPQtvXI.woff2)');
+const abelFontti = new FontFace('Abel','url(https://fonts.gstatic.com/s/abel/v18/MwQ5bhbm2POE2V9BPQ.woff2)');
 
 hennyFontti.load().then(() => {
     document.fonts.add(hennyFontti);
-    fontOK = true;
+    hennyOK = true;
 }, (err) => {
     console.log(err);
 },
@@ -45,6 +46,15 @@ rowdiesFontti.load().then(() => {
     console.log(err);
 } 
 );
+
+abelFontti.load().then(() => {
+    document.fonts.add(abelFontti);
+    abelOK = true;
+}, (err) => {
+    console.log(err);
+}
+);
+
 
 /*
 // Skaalaus
@@ -207,9 +217,10 @@ class Pelaaja {
             if (this.framelaskuri == 28) {
                 this.gameOver = true;
                 this.nopeus.x = 0;
+                tila = 'g';
             } else {
                 this.framelaskuri += 1;
-                // Lasketaan liikkuumisnopeus framelaskurin mukaan
+                // Lasketaan liikkumisnopeus framelaskurin mukaan
                 this.nopeus.x = (this.framelaskuri < 8) ? 3 : (this.framelaskuri < 16) ? 2 : (this.framelaskuri < 24) ? 1 : 0;
                 this.paikka.x += this.nopeus.x; 
             }
@@ -292,6 +303,20 @@ class Pelaaja {
         pistemaara = 0;
         this.kaatuu = false;
         this.gameOver = false;
+        this.kuvarivi = 0;
+        this.hyppyKaynnissa = false; // Onko hahmo hyppäämässä, tämän avulla estetään hyppäämästä uudelleen ilmassa
+        this.aidanTakana = false; // Onko hahmo aidan takana
+        this.vaihdetaanPuolta = false; // Vaihdetaanko hypätessä aidan toiselle puolelle
+        this.framelaskuri = 0; // Apulaskuri hyppyjen ja kaatumisen animointiin
+        this.edellinenKuvarivi = 0; // Apumuuttuja hypyn jälkeiselle animaatioriville
+        this.nopeus = { // Hahmon nopeus
+            x: 0,
+            y: 0
+        }
+        this.paikka = { // Hahmon "paikka"
+            x: 0,
+            y: 0
+        }
     }
 } // end class Pelaaja
 
@@ -391,13 +416,13 @@ function painettu(nappi) {
             case 'ArrowUp':
             case 'w':
             case 'W':
-                    tila = 'p';
+                tila = 'p';
                 pelaaja.nopeus.x = 3;
                 break;
             case 'ArrowDown':
             case 's':
             case 'S':
-                        hahmoid = (hahmoid+1 < hahmot.length) ? hahmoid += 1 : 0;
+                hahmoid = (hahmoid+1 < hahmot.length) ? hahmoid += 1 : 0;
                 pelaaja.vaihdaHahmo(hahmoid);
                 break;
         }
@@ -406,8 +431,12 @@ function painettu(nappi) {
     if (tila == 'o') {
         switch (nappi) {
             case 'ArrowUp':
+            case 'w':
+            case 'W':
                 break;
             case 'ArrowDown':
+            case 's':
+            case 'S':
                 break;
         }
     } else 
@@ -415,8 +444,15 @@ function painettu(nappi) {
     if (tila == 'g') {
         switch (nappi) {
             case 'ArrowUp':
+            case 'w':
+            case 'W':
+                tila = 'a';
+                pelaaja.nollaa();
                 break;
             case 'ArrowDown':
+            case 's':
+            case 'S':
+                tila = 'a';
                 break;
         }
     } else 
@@ -424,6 +460,8 @@ function painettu(nappi) {
     if (tila == 'p') {
         switch (nappi) {
             case 'ArrowUp':
+            case 'w':
+            case 'W':
                 if (!pelaaja.hyppyKaynnissa) {
                     pelaaja.hyppyKaynnissa = true;
                     pelaaja.nopeus.y = -8;
@@ -432,6 +470,8 @@ function painettu(nappi) {
                 }
             break;
             case 'ArrowDown':
+            case 's':
+            case 'S':
                 if (!pelaaja.hyppyKaynnissa) {
                     pelaaja.hyppyKaynnissa = true;
                     pelaaja.nopeus.y = -8;
@@ -474,7 +514,6 @@ function sallinapit() {
 // == ONLOAD ===========================================================================================
 // Odotetaan että sivu ja kaikki sen resurssit on latautunut
 window.onload = () => {
-    console.log('onload');
     document.getElementById('odota').style.display = 'none';
     document.getElementById('kanvaasi').style.opacity = 1;
     
@@ -705,13 +744,15 @@ function animoi(aika) {
 
              */
 
+             // linnun piirtäminen
              lintu2.paivita();
              lintu2.piirra();
  
+             // neljännen tausta piirtäminen (puut)
              taustat[3].piirra(pelaaja.nopeus.x);
 
              /*
-             // Tämä piirtää neljännen taustan 5 kertaa perääkäin
+             // Tämä piirtää neljännen taustan 5 kertaa peräkkäin
              taustat.forEach((tausta,indeksi) => {
                  taustat[3].piirra(pelaaja.nopeus.x);
              });
@@ -777,8 +818,9 @@ function animoi(aika) {
 
                 ctx.fillStyle = (pistelisays > 0) ? 'green' : 'red';
                 ctx.font = '32px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(pmaara,canwidth / 2, 32);
+                ctx.letterSpacing = '0px';
+                ctx.textAlign = 'left';
+                ctx.fillText(pmaara,canwidth / 2 - 44, 32);
 
             } // end pelitila
         }
