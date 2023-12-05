@@ -36,6 +36,16 @@ hennyFontti.load().then(() => {
 },
 );
 
+// Fontti tekstiin Terttu ja Mika esittävät pelin
+const rowdiesFontti = new FontFace('Rowdies', 'url(https://fonts.gstatic.com/s/rowdies/v5/ptRHTiWdbvZIDOjQe0tG6ZB3HM6b6A.woff2)');
+rowdiesFontti.load().then(() => {
+  document.fonts.add(rowdiesFontti);
+  fontOK = true;
+}, (err) => {
+    console.log(err);
+} 
+);
+
 /*
 // Skaalaus
 function laskeSkaala() {
@@ -493,6 +503,7 @@ window.onload = () => {
     ];
 
     lintu2 = new Lintu2(); // musta lintu
+    lintu1 = new Lintu1(); // kauempana oleva lintu
 
     window.addEventListener('keydown', (eve) => {
         painettu(eve.key);
@@ -557,14 +568,18 @@ class Tausta {
         }
     }
 }
-
+// Arpoo satunnaisen kokonaisluvun väliltä min (mukaan lukien) ja max (mukaan lukien)
+function arvoSatunnainenLuku(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+console.log(arvoSatunnainenLuku, "arvoSatunnainenLuku")
 //musta lintu
 class Lintu2 {
     constructor() {
         this.animFrameja = 16; // Vaihda tason määrä
         this.nykyinenFrame = 0;
         this.leveys = lintuImg2.width / this.animFrameja;
-        this.korkeus = 290; // Pienennetty korkeus
+        this.korkeus = 390; // Pienennetty korkeus
         this.paikka = {
             x: -210,  // Aseta linnun alku sivun vasempaan reunaan
             y: canheight - this.korkeus 
@@ -591,12 +606,66 @@ class Lintu2 {
     paivita() {
         // Vaakasuuntainen liike
         this.paikka.x += this.nopeus.x;
-
         // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
-        if (this.paikka.x + this.leveys > canwidth + 1000) { // lukua muuttamalla lintu pysyy näkymättömissä
+        if (this.paikka.x + this.leveys > canwidth + 1000 + this.satunnainenLuku) { // lukua muuttamalla lintu pysyy näkymättömissä
             this.paikka.x = -210;
+            console.log(this.satunnainenLuku, "luku")
+            this.generoiSatunnainenLuku();
         }
     }
+
+    generoiSatunnainenLuku() {
+        this.satunnainenLuku = arvoSatunnainenLuku(1, 1000);
+        console.log(this.satunnainenLuku, "Generoi");
+    } 
+}
+
+//musta lintu
+class Lintu1 {
+    constructor() {
+        this.animFrameja = 16; // Vaihda tason määrä
+        this.nykyinenFrame = 0;
+        this.leveys = lintuImg2.width / this.animFrameja;
+        this.korkeus = 380; // Pienennetty korkeus
+        this.paikka = {
+            x: -220,  // Aseta linnun alku sivun vasempaan reunaan
+            y: canheight - this.korkeus 
+        };
+        this.nopeus = {
+            x: 1.1,  // Aseta linnun vaakasuuntainen nopeus
+            y: 0
+        };
+        this.generoiSatunnainenLuku();        
+    }
+    
+       piirra() {
+        ctx.drawImage(lintuImg2,
+            this.nykyinenFrame * this.leveys, /* source x */
+            0, /* source y */
+            this.leveys,
+            this.korkeus,
+            this.paikka.x, /* destination x */
+            this.paikka.y, /* destination y */
+            this.leveys / 4,
+            this.korkeus / 4);
+        this.nykyinenFrame = (this.nykyinenFrame < this.animFrameja - 1) ? this.nykyinenFrame += 1 : 0;
+    }
+    
+    paivita() {
+        // Vaakasuuntainen liike
+        this.paikka.x += this.nopeus.x;
+        // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
+        if (this.paikka.x + this.leveys > canwidth + 1000 + this.satunnainenLuku) { // lukua muuttamalla lintu pysyy näkymättömissä
+            this.paikka.x = -210;
+            console.log(this.satunnainenLuku, "luku")
+            this.generoiSatunnainenLuku();
+        }
+    }
+
+    generoiSatunnainenLuku() {
+        this.satunnainenLuku = arvoSatunnainenLuku(1, 1000);
+        console.log(this.satunnainenLuku, "Generoi");
+    } 
 }
 
 // Canvasin animointi
@@ -615,7 +684,10 @@ function animoi(aika) {
 
             /* sininen taivas taustalla takimmaisena */
             ctx.fillStyle = 'skyblue';
-            ctx.fillRect(0,0,canwidth,canheight); 
+            ctx.fillRect(0,0,canwidth,canheight);
+
+            lintu1.paivita();
+            lintu1.piirra();
 
             // Piirretään taustat 0-2 kerran 
             for(let i=0; i < 3; i++) {
@@ -667,12 +739,22 @@ function animoi(aika) {
             if (tila == 'a') {
                 // aloitusruudun piirtäminen
                 if (fontOK) {
-                    ctx.fillStyle = 'black';
-                    ctx.font = '32px "Henny Penny"';
+                    ctx.fillStyle = 'rgb(233, 88, 4)';
+                    ctx.font = '32px "Rowdies"';
                     ctx.textAlign = 'center';
-                    ctx.fillText('Terttu ja Mika', canwidth / 2, 35)
-                    ctx.fillText('esittävät pelin', canwidth / 2, 80)
+                    var text = 'Terttu ja Mika'
+                    var text2 = 'esittävät pelin'
+                    var text3 = 'Mennään siitä mistä aita on matalin'
+                    ctx.strokeStyle = 'black';  // Reunaviivan väri
+                    ctx.lineWidth = 1.5;          // Reunaviivan leveys
+                    ctx.strokeText(text, canvas.width / 2, 35);
+                    ctx.fillText(text, canvas.width / 2, 35)
+                    ctx.strokeText(text2, canvas.width / 2, 80);
+                    ctx.fillText(text2, canvas.width / 2, 80)
                     ctx.font = '48px "Henny Penny"';
+                    ctx.lineWidth = 4; 
+                    ctx.strokeText(text3, canvas.width / 2, 80+60);
+                    ctx.fillText(text3, canvas.width / 2, 80+60)
                     ctx.fillText('Mennään siitä mistä aita on matalin',canwidth / 2, 80+60);
                 }
             } else
