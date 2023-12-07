@@ -64,7 +64,7 @@ abelFontti.load().then(() => {
 );
 
 function rakennaHaive() {
-    let alku = new Array(40).fill(0), loppu = [], keskikohta = new Array(30*5).fill(1);
+    let alku = new Array(40).fill(0), loppu = [], keskikohta = new Array(30*6).fill(1);
     let p = 1;
     for (let i=0; i<1; i += 0.1) {
         for (let maara=0; maara < 2; maara++) {
@@ -695,7 +695,9 @@ const alkutekstit = [
     ['','Paina nuoli ylös tai w aloittaaksesi','Paina nuoli alas tai s vaihtaaksesi hahmoa'],
     ['Hahmojen animaatiot / Character animation sprites','','www.gameart2d.com'],
     ['Taustagrafiikat / Background graphics','Mobile Game Graphics','www.opengameart.com'],
-    ['Musiikki / Music','Digital Love by AlexiAction','www.pixabay.com']
+    ['Musiikki / Music','Digital Love by AlexiAction','www.pixabay.com'],
+    ['Projektissa käytetyt ohjelmat','Visual Studio Code, Git, Adobe Photoshop,','Corel PaintShop Pro, Piskel, VLC Media Player'],
+    ['(C) 2023','Terttu Toivonen','Mika Jalkanen']
 ];
 let haivekohta = [31,16,1], tekstinkohta = 0;
 
