@@ -403,7 +403,7 @@ class Aita {
 
 // Pelin aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3 = tiiliaidan pääty
 // HUOM! alussa 3 kpl nollaa ja kakkosen jälkeen aina kolmonen että tiiliaita päättyy siististi
-const aitaelementit = [0,0,0,1,1,2,2,3,1,1,2,2,3,1,1,2,2,2,2,3,1,1,2,2,2,2,2,3,1,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,3,1,2,3,1,2,3,1,1]
+const aitaelementit = [0,0,0,1,1,2,2,3,1,1,2,2,3,1,1,2,2,2,2,3,1,1,2,2,2,2,2,3,1,1,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,3,1,2,3,1,2,3,1,1]
 // Aita-elementtien levydet: ei aitaa = 220, puuaita = 142, tiiliaita = 220, tiiliaidan pääty = 29
 const elementtienLeveydet = [220, 142, 220, 29];
 // Aita-elementtien x-offset eli jos samaa elementtiä on monta kertaa peräkkäin, paljonko seuraava elementti menee edellisen päälle
@@ -778,9 +778,9 @@ function animoi(aika) {
             // pelaajan nopeuden määrittelyä
             if (pelaaja.paikka.x > 2000 && pelaaja.nopeus.x == 3) pelaaja.nopeus.x = 4;
             if (pelaaja.paikka.x > 2050 && pelaaja.nopeus.x == 4) pelaaja.nopeus.x = 5;
-            if (pelaaja.paikka.x > 20000 && pelaaja.nopeus.x == 5) pelaaja.nopeus.x = 4;
-            if (pelaaja.paikka.x > 20050 && pelaaja.nopeus.x == 4) pelaaja.nopeus.x = 3;
-            if (!pelaaja.hyppyKaynnissa && pelaaja.paikka.x > 20100 && pelaaja.nopeus.x == 3) {
+            if (pelaaja.paikka.x > 30000 && pelaaja.nopeus.x == 5) pelaaja.nopeus.x = 4;
+            if (pelaaja.paikka.x > 30050 && pelaaja.nopeus.x == 4) pelaaja.nopeus.x = 3;
+            if (!pelaaja.hyppyKaynnissa && pelaaja.paikka.x > 30100 && pelaaja.nopeus.x == 3) {
                 pelaaja.nopeus.x = 0;
                 pelaaja.gameOver = true;
                 lopputeksti = 'Onneksi olkoon! Pääsit radan läpi pistemäärällä '+Math.round(pistemaara / 10);
@@ -898,7 +898,7 @@ function animoi(aika) {
                     'Ohjeet',
                     ' ',
                     'Pelin tarkoituksena on kerätä mahdollisimman suuri pistemäärä', 
-                    'hyppimällä aidan taakse ja eteen. Aidan toiselle puolella voi',
+                    'hyppimällä aidan taakse ja eteen. Aidan toiselle puolelle voi',
                     'hypätä vain kohdissa joissa ei ole aitaa tai on puuaita.', 
                     '',
                     'Hahmo hyppää aidan taakse painamalla nuoli ylös tai w-näppäintä.',
