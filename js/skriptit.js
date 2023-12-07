@@ -30,7 +30,7 @@ lintuImg2.onerror = function() {
 }
 lintuImg2.src = '../kuvat/mustatLinnut2.png';
 
-let taustat = [], lintu2 // taustakuvia varten
+let taustat = [], lintu1, lintu2 // taustakuvia varten
 
 // Fontit
 const hennyFontti = new FontFace('Henny Penny','url(https://fonts.gstatic.com/s/hennypenny/v17/wXKvE3UZookzsxz_kjGSfPQtvXI.woff2)');
@@ -568,8 +568,8 @@ window.onload = () => {
         new Tausta(0,1418,1920,25,-canheight,1.1) // keltainen maa 
     ];
 
-    lintu2 = new Lintu2(); // musta lintu
-    lintu1 = new Lintu1(); // kauempana oleva lintu
+    lintu2 = new Lintu(390, 1.5, 2); // musta lintu korkeus, koko, nopeus
+    lintu1 = new Lintu(370, 3, 4); // kauempana oleva lintu
 
     window.addEventListener('keydown', (eve) => {
         painettu(eve.key);
@@ -686,25 +686,28 @@ class Lintu2 {
     } 
 }
 
+
 //musta lintu
-class Lintu1 {
-    constructor() {
+class Lintu {
+    constructor(korkeus, koko, nopeus) {
+        this.korkeus = korkeus;
+        this.koko = koko;
+        this.nopeus = nopeus;
         this.animFrameja = 16; // Vaihda tason määrä
         this.nykyinenFrame = 0;
         this.leveys = lintuImg2.width / this.animFrameja;
-        this.korkeus = 380; // Pienennetty korkeus
+        //this.korkeus = 390; // Pienennetty korkeus
         this.paikka = {
-            x: -220,  // Aseta linnun alku sivun vasempaan reunaan
+            x: -210,  // Aseta linnun alku sivun vasempaan reunaan
             y: canheight - this.korkeus 
         };
         this.nopeus = {
-            x: 1.2,  // Aseta linnun vaakasuuntainen nopeus
+            x: this.nopeus,  // Aseta linnun vaakasuuntainen nopeus
             y: 0
         };
-        this.generoiSatunnainenLuku();        
     }
-    
-       piirra() {
+
+    piirra() {
         ctx.drawImage(lintuImg2,
             this.nykyinenFrame * this.leveys, /* source x */
             0, /* source y */
@@ -712,11 +715,11 @@ class Lintu1 {
             this.korkeus,
             this.paikka.x, /* destination x */
             this.paikka.y, /* destination y */
-            this.leveys / 4,
-            this.korkeus / 4);
+            this.leveys / this.koko,
+            this.korkeus / this.koko);
         this.nykyinenFrame = (this.nykyinenFrame < this.animFrameja - 1) ? this.nykyinenFrame += 1 : 0;
     }
-    
+
     paivita() {
         // Vaakasuuntainen liike
         this.paikka.x += this.nopeus.x;
@@ -729,7 +732,7 @@ class Lintu1 {
     }
 
     generoiSatunnainenLuku() {
-        this.satunnainenLuku = arvoSatunnainenLuku(1, 1000);
+        this.satunnainenLuku = arvoSatunnainenLuku(1, 500);
         console.log(this.satunnainenLuku, "Generoi");
     } 
 }
@@ -777,20 +780,23 @@ function animoi(aika) {
             ctx.fillStyle = 'skyblue';
             ctx.fillRect(0,0,canwidth,canheight);
 
+            // Piirretään taustat 0-1 kerran 
+            for(let i=0; i < 2; i++) {
+                taustat[i].piirra(pelaaja.nopeus.x);
+            }
+
             lintu1.paivita();
             lintu1.piirra();
 
-            // Piirretään taustat 0-2
-            for(let i=0; i < 3; i++) {
-                taustat[i].piirra(pelaaja.nopeus.x);
-            }
+            // kolmannen taustan piirtäminen (puut)
+            taustat[2].piirra(pelaaja.nopeus.x);
             
-             // linnun piirtäminen
-             lintu2.paivita();
-             lintu2.piirra();
+            // linnun piirtäminen
+            lintu2.paivita();
+            lintu2.piirra();
  
-             // neljännen tausta piirtäminen (puut)
-             taustat[3].piirra(pelaaja.nopeus.x);
+            // neljännen taustan piirtäminen (puut)
+            taustat[3].piirra(pelaaja.nopeus.x);
 
             // Aitojen ja pelaajan hahmon piirtäminen
             // Onko hahmo aidan takana?
@@ -834,9 +840,9 @@ function animoi(aika) {
                     ctx.fillStyle = 'rgb(233, 88, 4)';
                     ctx.font = '32px Rowdies';
                     ctx.textAlign = 'center';
-                    var text = 'Terttu ja Mika'
-                    var text2 = 'esittävät pelin'
-                    var text3 = 'Mennään siitä mistä aita on matalin'
+                    let text = 'Terttu ja Mika'
+                    let text2 = 'esittävät pelin'
+                    let text3 = 'Mennään siitä mistä aita on matalin'
 
                     varjo(true);
 
