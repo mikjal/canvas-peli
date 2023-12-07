@@ -8,12 +8,13 @@ let pistemaara = 0, pistelisays = 50, painovoima = 0.5, hahmoid = 0;
 let tila = 'a'; // a = aloitusruutu, o = ohjeet, p = peli käynnissä, g = game over
 let touch = false; // tukeeko laite kosketusta?
 let aidat = []; // Aita-luokan oliot
-let hennyOK = false, abelOK = false, fontOK = false, audioOK = false, lopputeksti = '';
+let hennyOK = false, abelOK = false, fontOK = false, audioOK = false, lopputeksti = '', naytaOhjeet = true, debug = false;
 const musiikki = new Audio();
 
 musiikki.oncanplaythrough = () => {
     audioOK = true;
 }
+musiikki.autoplay = false;
 musiikki.src = '../musiikki/digital-love-reduced-bitrate.mp3';
 
 // Taustakuvat
@@ -44,7 +45,6 @@ hennyFontti.load().then(() => {
 );
 
 // Fontti tekstiin Terttu ja Mika esittävät pelin
-// const rowdiesFontti = new FontFace('Rowdies', 'url(https://fonts.gstatic.com/s/rowdies/v5/ptRHTiWdbvZIDOjQe0tG6ZB3HM6b6A.woff2)');
 const rowdiesFontti = new FontFace('Rowdies', 'url(https://fonts.gstatic.com/s/rowdies/v17/ptRJTieMYPNBAK21_rBDwQ.woff2)');
 
 rowdiesFontti.load().then(() => {
@@ -78,27 +78,6 @@ function rakennaHaive() {
 }
 
 const haive = rakennaHaive();
-/*
-// Skaalaus
-function laskeSkaala() {
-    // Lasketaan suhdeluvut levydelle ja korkeudelle
-    let lev = (window.innerWidth-10) / canwidth, kor = (window.innerHeight-15) / canheight;
-    // Kumman mukaan säädetään skaala, leveyden vai korkeuden?
-    let skaala = (lev < kor) ? (Math.round(lev * 100)) / 100 : (Math.round(kor * 100)) / 100;
-    // Minimi on 0.35, maksimi 1.5
-    skaala = (skaala < 0.35) ? 0.35 : (skaala <= 1.5) ? skaala : 1.5;
-    console.log(window.innerWidth,window.innerHeight,skaala);
-
-    // Muutetaan kaikki skaalaus-luokan elementit käyttämään uutta arvoa
-    document.querySelectorAll('.skaalaus').forEach((ele) => {
-        ele.style.transform = 'scale('+skaala+')';
-        ele.style.transformOrigin = '50% 0';
-    });
-}
-*/
-/*
-laskeSkaala();
-*/
 
 // Hahmojen mukaiset tiedot
 const hahmot = [
@@ -201,6 +180,19 @@ class Pelaaja {
             // Jos peli ei ole ohi lasketaan seuraavalla kerralla piirrettävä ruutu
             if (!this.gameOver) { 
                 this.nykyinenFrame = (this.nykyinenFrame < 30-1) ? this.nykyinenFrame += 1 : 0;
+            }
+
+            // Debug
+            if (this.hyppyKaynnissa && debug && this.vaihdetaanPuolta) {
+                ctx.globalAlpha = 0.2;
+                ctx.fillStyle = 'red';
+                ctx.fillRect(
+                    this.piirtopaikka.x + this.hitbox.alkaa,
+                    this.piirtopaikka.y - this.yOffsetit[this.kuvarivi] + this.paikka.y,
+                    this.hitbox.paattyy - this.hitbox.alkaa,
+                    this.korkeus
+                );
+                ctx.globalAlpha = 1;
             }
         }
     } // end piirra()
@@ -411,7 +403,7 @@ class Aita {
 
 // Pelin aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3 = tiiliaidan pääty
 // HUOM! alussa 3 kpl nollaa ja kakkosen jälkeen aina kolmonen että tiiliaita päättyy siististi
-const aitaelementit = [0,0,0,1,1,2,2,3,1,1,2,2,3,1,1,2,2,2,2,3,1,1,2,2,2,2,2,3,1,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1,2,3]
+const aitaelementit = [0,0,0,1,1,2,2,3,1,1,2,2,3,1,1,2,2,2,2,3,1,1,2,2,2,2,2,3,1,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,3,1,2,3,1,2,3,1,1]
 // Aita-elementtien levydet: ei aitaa = 220, puuaita = 142, tiiliaita = 220, tiiliaidan pääty = 29
 const elementtienLeveydet = [220, 142, 220, 29];
 // Aita-elementtien x-offset eli jos samaa elementtiä on monta kertaa peräkkäin, paljonko seuraava elementti menee edellisen päälle
@@ -443,8 +435,12 @@ function painettu(nappi) {
             case 'W':
                 // Jos hahmon kuvan lataaminen ei ole kesken aloitetaan peli
                 if (pelaaja.saaPiirtaa) {
-                    tila = 'p';
-                    pelaaja.nopeus.x = 3;
+                    if (naytaOhjeet) {
+                        tila = 'o';
+                    } else {
+                        tila = 'p';
+                        pelaaja.nopeus.x = 3;
+                    }
                 }
                 break;
             case 'ArrowDown':
@@ -467,6 +463,8 @@ function painettu(nappi) {
             case 'ArrowDown':
             case 's':
             case 'S':
+                tila='p';
+                pelaaja.nopeus.x = 3;
                 break;
         }
     } else 
@@ -745,6 +743,22 @@ const alkutekstit = [
 ];
 let haivekohta = [31,16,1], tekstinkohta = 0;
 
+function varjo(paalle) {
+    if (paalle) {
+        // varjo päälle
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 4;
+    } else {
+        // varjo pois
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowColor = 'rgba(0,0,0,0)';
+        ctx.shadowBlur = 0;
+    }
+}
+
 // Canvasin animointi
 function animoi(aika) {
     // Kutsutaan tätä samaa funktiota ennen seuraavaa ruudun "maalausta"
@@ -766,35 +780,17 @@ function animoi(aika) {
             lintu1.paivita();
             lintu1.piirra();
 
-            // Piirretään taustat 0-2 kerran 
+            // Piirretään taustat 0-2
             for(let i=0; i < 3; i++) {
                 taustat[i].piirra(pelaaja.nopeus.x);
             }
             
-            /* 
-            // Tämä piirtää kolme ensimmäistä taustaa 5 kertaa peräkkäin (koska taustat sisältää viisi eri taustaa)
-            taustat.forEach((tausta,indeksi) => {
-                taustat[0].piirra(pelaaja.nopeus.x);
-                taustat[1].piirra(pelaaja.nopeus.x);  
-                taustat[2].piirra(pelaaja.nopeus.x);
- 
-             });
-
-             */
-
              // linnun piirtäminen
              lintu2.paivita();
              lintu2.piirra();
  
              // neljännen tausta piirtäminen (puut)
              taustat[3].piirra(pelaaja.nopeus.x);
-
-             /*
-             // Tämä piirtää neljännen taustan 5 kertaa peräkkäin
-             taustat.forEach((tausta,indeksi) => {
-                 taustat[3].piirra(pelaaja.nopeus.x);
-             });
-             */
 
             // Aitojen ja pelaajan hahmon piirtäminen
             // Onko hahmo aidan takana?
@@ -819,9 +815,11 @@ function animoi(aika) {
             taustat[4].piirra(pelaaja.nopeus.x);
             
             // pelaajan nopeuden määrittelyä
-            if (pelaaja.paikka.x > 2000 && pelaaja.nopeus.x == 3) pelaaja.nopeus.x = 5;
-            if (pelaaja.paikka.x > 20000 && pelaaja.nopeus.x == 5) pelaaja.nopeus.x = 3;
-            if (!pelaaja.hyppyKaynnissa && pelaaja.paikka.x > 20200 && pelaaja.nopeus.x == 3) {
+            if (pelaaja.paikka.x > 2000 && pelaaja.nopeus.x == 3) pelaaja.nopeus.x = 4;
+            if (pelaaja.paikka.x > 2050 && pelaaja.nopeus.x == 4) pelaaja.nopeus.x = 5;
+            if (pelaaja.paikka.x > 20000 && pelaaja.nopeus.x == 5) pelaaja.nopeus.x = 4;
+            if (pelaaja.paikka.x > 20050 && pelaaja.nopeus.x == 4) pelaaja.nopeus.x = 3;
+            if (!pelaaja.hyppyKaynnissa && pelaaja.paikka.x > 20100 && pelaaja.nopeus.x == 3) {
                 pelaaja.nopeus.x = 0;
                 pelaaja.gameOver = true;
                 lopputeksti = 'Onneksi olkoon! Pääsit radan läpi pistemäärällä '+Math.round(pistemaara / 10);
@@ -840,11 +838,7 @@ function animoi(aika) {
                     var text2 = 'esittävät pelin'
                     var text3 = 'Mennään siitä mistä aita on matalin'
 
-                    // varjo
-                    ctx.shadowOffsetX = 3;
-                    ctx.shadowOffsetY = 3;
-                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                    ctx.shadowBlur = 4;
+                    varjo(true);
 
                     ctx.strokeStyle = 'black';  // Reunaviivan väri
                     ctx.lineWidth = 1.5;          // Reunaviivan leveys
@@ -877,12 +871,8 @@ function animoi(aika) {
 
                     ctx.letterSpacing = '0px';
                     
-                    // varjo pois
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 0;
-                    ctx.shadowColor = 'rgba(0,0,0,0)';
-                    ctx.shadowBlur = 0;
-                    
+                    varjo(false);
+
                     haivekohta.forEach((arvo, ndx) => {
                         arvo = (arvo+1 == haive.length) ? 0 : arvo + 1;
                         haivekohta[ndx] = arvo;
@@ -928,24 +918,52 @@ function animoi(aika) {
                 ctx.lineWidth = 3;
                 ctx.letterSpacing = '2px';
                 ctx.textAlign = 'center';
-                // varjo
-                ctx.shadowOffsetX = 3;
-                ctx.shadowOffsetY = 3;
-                ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 4;
+
+                varjo(true);
 
                 // 230, 280, 330
                 ctx.strokeText('Peli päättyi!',canwidth / 2, 230);
                 ctx.fillText('Peli päättyi!',canwidth / 2, 230);
                 ctx.strokeText(lopputeksti,canwidth / 2, 280);
                 ctx.fillText(lopputeksti,canwidth / 2, 280);
-                ctx.strokeText('Paina nuoli ylös tai w jatkaaksesi',canwidth / 2, 330);
-                ctx.fillText('Paina nuoli ylös tai w jatkaaksesi',canwidth / 2, 330);
+                ctx.strokeText('Paina hyppynäppäintä jatkaaksesi',canwidth / 2, 330);
+                ctx.fillText('Paina hyppynäppäintä jatkaaksesi',canwidth / 2, 330);
+                varjo(false);
 
             } else
             // ohjeet
             if (tila == 'o') {
-
+                let ohjeet = [
+                    'Ohjeet',
+                    ' ',
+                    'Pelin tarkoituksena on kerätä mahdollisimman suuri pistemäärä', 
+                    'hyppimällä aidan taakse ja eteen. Aidan toiselle puolella voi',
+                    'hypätä vain kohdissa joissa ei ole aitaa tai on puuaita.', 
+                    '',
+                    'Hahmo hyppää aidan taakse painamalla nuoli ylös tai w-näppäintä.',
+                    'Takaisin aidan eteen pääsee painamalla nuoli alas tai s-näppäintä.',
+                    '',
+                    'Mitä kauemmin etenet samalla puolella aitaa,', 
+                    'sen vähemmän pisteitä saat. Jos etenet samalla', 
+                    'puolella liian kauan, alkavat pisteesi vähentyä.',
+                    '',
+                    'Paina hyppynäppäintä aloittaaksesi.'
+                ];
+                ctx.font = 'bold 32px Abel';
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.letterSpacing = '2px';
+                ctx.textAlign = 'center';
+                varjo(true);
+                let tpaikka = 30;
+                for (let i=0; i<ohjeet.length; i++) {
+                    ctx.strokeText(ohjeet[i],canwidth / 2, tpaikka);
+                    ctx.fillText(ohjeet[i],canwidth / 2, tpaikka);
+                    tpaikka += 40;
+                }
+                naytaOhjeet = false;
+                varjo(false);
             }
         }
     }
