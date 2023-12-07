@@ -8,7 +8,13 @@ let pistemaara = 0, pistelisays = 50, painovoima = 0.5, hahmoid = 0;
 let tila = 'a'; // a = aloitusruutu, o = ohjeet, p = peli käynnissä, g = game over
 let touch = false; // tukeeko laite kosketusta?
 let aidat = []; // Aita-luokan oliot
-let hennyOK = false, abelOK = false;
+let hennyOK = false, abelOK = false, fontOK = false, audioOK = false, lopputeksti = '';
+const musiikki = new Audio();
+
+musiikki.oncanplaythrough = () => {
+    audioOK = true;
+}
+musiikki.src = '../musiikki/digital-love-reduced-bitrate.mp3';
 
 // Taustakuvat
 const taustakuvat = new Image();
@@ -38,7 +44,9 @@ hennyFontti.load().then(() => {
 );
 
 // Fontti tekstiin Terttu ja Mika esittävät pelin
-const rowdiesFontti = new FontFace('Rowdies', 'url(https://fonts.gstatic.com/s/rowdies/v5/ptRHTiWdbvZIDOjQe0tG6ZB3HM6b6A.woff2)');
+// const rowdiesFontti = new FontFace('Rowdies', 'url(https://fonts.gstatic.com/s/rowdies/v5/ptRHTiWdbvZIDOjQe0tG6ZB3HM6b6A.woff2)');
+const rowdiesFontti = new FontFace('Rowdies', 'url(https://fonts.gstatic.com/s/rowdies/v17/ptRJTieMYPNBAK21_rBDwQ.woff2)');
+
 rowdiesFontti.load().then(() => {
   document.fonts.add(rowdiesFontti);
   fontOK = true;
@@ -55,7 +63,21 @@ abelFontti.load().then(() => {
 }
 );
 
+function rakennaHaive() {
+    let alku = new Array(40).fill(0), loppu = [], keskikohta = new Array(30*5).fill(1);
+    let p = 1;
+    for (let i=0; i<1; i += 0.1) {
+        for (let maara=0; maara < 2; maara++) {
+            alku.push(Math.round(i*100) / 100);
+            loppu.push(Math.round(p*100) / 100)
+        }
+        p -= 0.1;
+    }
+    for (let i=0; i<20; i++) loppu.push(0);
+    return alku.concat(keskikohta,loppu);
+}
 
+const haive = rakennaHaive();
 /*
 // Skaalaus
 function laskeSkaala() {
@@ -186,8 +208,10 @@ class Pelaaja {
     tarkastaOsuma() {
         let osuma = false;
         aidat.forEach((aita) => {
-            if (aita.osuuko(this.piirtopaikka.x + this.hitbox.alkaa, this.piirtopaikka.x + this.hitbox.paattyy)) {
-                osuma = true;
+            if (aita.nakyvilla) {
+                if (aita.osuuko(this.piirtopaikka.x + this.hitbox.alkaa, this.piirtopaikka.x + this.hitbox.paattyy)) {
+                    osuma = true;
+                }
             }
         })
         return osuma;
@@ -245,6 +269,7 @@ class Pelaaja {
                     if (this.tarkastaOsuma()) {
                         // Kyllä, osuu aitaan
                         this.kaatuu = true;
+                        lopputeksti = 'Osuit hypätessäsi tiiliaitaan';
                     } else {
                         // Ei osu aitaan
                         this.aidanTakana = !this.aidanTakana;
@@ -275,7 +300,7 @@ class Pelaaja {
             }
         }
 
-        this.piirra();
+        //this.piirra();
     } // End paivita()
 
     vaihdaHahmo(id) {
@@ -351,7 +376,7 @@ class Aita {
         // tarkistetaan onko aita näkyvillä, jos on piirretään se
         if (this.piirtopaikka + this.kuva.leveys >= 0 && this.piirtopaikka <= canvas.width) {
             //if (this.tyyppi != 0) {
-                if (pelaaja.kaatuu && pelaaja.aidanTakana) ctx.globalAlpha = 0.7;
+                if (pelaaja.kaatuu && pelaaja.aidanTakana && this.tyyppi != 1) ctx.globalAlpha = 0.6;
                 ctx.drawImage(taustakuvat,
                     this.kuva.x, // Source
                     this.kuva.y,
@@ -373,7 +398,7 @@ class Aita {
     }
 
     osuuko(hahmonAlku, hahmonLoppu) {
-        if (!this.nakyvilla || this.tyyppi == 1) {
+        if (this.tyyppi == 1) {
             return false
         } else {
             if (hahmonLoppu >= this.piirtopaikka && hahmonAlku <= this.piirtopaikka + this.kuva.leveys) {
@@ -386,7 +411,7 @@ class Aita {
 
 // Pelin aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3 = tiiliaidan pääty
 // HUOM! alussa 3 kpl nollaa ja kakkosen jälkeen aina kolmonen että tiiliaita päättyy siististi
-const aitaelementit = [0,0,0,1,1,2,2,3,0,1,1,1]
+const aitaelementit = [0,0,0,1,1,2,2,3,1,1,2,2,3,1,1,2,2,2,2,3,1,1,2,2,2,2,2,3,1,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1,2,3]
 // Aita-elementtien levydet: ei aitaa = 220, puuaita = 142, tiiliaita = 220, tiiliaidan pääty = 29
 const elementtienLeveydet = [220, 142, 220, 29];
 // Aita-elementtien x-offset eli jos samaa elementtiä on monta kertaa peräkkäin, paljonko seuraava elementti menee edellisen päälle
@@ -416,14 +441,20 @@ function painettu(nappi) {
             case 'ArrowUp':
             case 'w':
             case 'W':
-                tila = 'p';
-                pelaaja.nopeus.x = 3;
+                // Jos hahmon kuvan lataaminen ei ole kesken aloitetaan peli
+                if (pelaaja.saaPiirtaa) {
+                    tila = 'p';
+                    pelaaja.nopeus.x = 3;
+                }
                 break;
             case 'ArrowDown':
             case 's':
             case 'S':
-                hahmoid = (hahmoid+1 < hahmot.length) ? hahmoid += 1 : 0;
-                pelaaja.vaihdaHahmo(hahmoid);
+                // Jos hahmon kuvan lataaminen ei ole kesken vaihdetaan hahmon kuvaa
+                if (pelaaja.saaPiirtaa) {
+                    hahmoid = (hahmoid+1 < hahmot.length) ? hahmoid += 1 : 0;
+                    pelaaja.vaihdaHahmo(hahmoid);
+                }
                 break;
         }
     } else 
@@ -433,7 +464,6 @@ function painettu(nappi) {
             case 'ArrowUp':
             case 'w':
             case 'W':
-                break;
             case 'ArrowDown':
             case 's':
             case 'S':
@@ -446,13 +476,12 @@ function painettu(nappi) {
             case 'ArrowUp':
             case 'w':
             case 'W':
-                tila = 'a';
-                pelaaja.nollaa();
-                break;
             case 'ArrowDown':
             case 's':
             case 'S':
                 tila = 'a';
+                pelaaja.nollaa();
+                tekstinkohta = 0;
                 break;
         }
     } else 
@@ -462,7 +491,7 @@ function painettu(nappi) {
             case 'ArrowUp':
             case 'w':
             case 'W':
-                if (!pelaaja.hyppyKaynnissa) {
+                if (!pelaaja.hyppyKaynnissa && !pelaaja.kaatuu) {
                     pelaaja.hyppyKaynnissa = true;
                     pelaaja.nopeus.y = -8;
                     // vaihdetaan puolta jos pelaaja ei ole aidan takana, muussa tapauksessa ei vaihdeta puolta
@@ -472,7 +501,7 @@ function painettu(nappi) {
             case 'ArrowDown':
             case 's':
             case 'S':
-                if (!pelaaja.hyppyKaynnissa) {
+                if (!pelaaja.hyppyKaynnissa && !pelaaja.kaatuu) {
                     pelaaja.hyppyKaynnissa = true;
                     pelaaja.nopeus.y = -8;
                     // vaihdetaan puolta jos pelaaja on aidan takana, muussa tapauksessa ei vaihdeta puolta
@@ -525,8 +554,8 @@ window.onload = () => {
         laskenappienpaikka();
     }
 
-    window.addEventListener('resize',laskenappienpaikka);
-    screen.orientation.addEventListener('change', laskenappienpaikka);
+    //window.addEventListener('resize',laskenappienpaikka);
+    //screen.orientation.addEventListener('change', laskenappienpaikka);
 
     // luodaan Tausta-luokan mukaiset oliot kaikille taustoille, piirretään järjestyksessä ensimmäisestä viimeiseen
     taustat = [
@@ -671,7 +700,7 @@ class Lintu1 {
             y: canheight - this.korkeus 
         };
         this.nopeus = {
-            x: 1.1,  // Aseta linnun vaakasuuntainen nopeus
+            x: 1.2,  // Aseta linnun vaakasuuntainen nopeus
             y: 0
         };
         this.generoiSatunnainenLuku();        
@@ -707,11 +736,20 @@ class Lintu1 {
     } 
 }
 
+const alkutekstit = [
+    // Aina kolmen rivin sarjoissa
+    ['','Paina nuoli ylös tai w aloittaaksesi','Paina nuoli alas tai s vaihtaaksesi hahmoa'],
+    ['','Hahmografiikat / Character animation sprites','www.gameart2d.com'],
+    ['Taustagrafiikat / Background graphics','Mobile Game Graphics','www.opengameart.com'],
+    ['Musiikki / Music','Digital Love by AlexiAction','www.pixabay.com']
+];
+let haivekohta = [31,16,1], tekstinkohta = 0;
+
 // Canvasin animointi
 function animoi(aika) {
     // Kutsutaan tätä samaa funktiota ennen seuraavaa ruudun "maalausta"
     window.requestAnimationFrame(animoi);
-    
+
     // Koska ruudunpäivitysnopeus on yleensä 60Hz tai suurempi, rajoitetaan ruudun 
     // piirtämistä n. 30 kertaan sekunnissa että animaatiot eivät pyöri liian nopeasti
     let fps = Math.round(1000 / (aika-vanhaAika));
@@ -763,29 +801,51 @@ function animoi(aika) {
             if (pelaaja.aidanTakana) {
                 // hahmo on aidan takana, piirretään se ensin
                 pelaaja.paivita();
+                pelaaja.piirra();
                 aidat.forEach((aita) => {
                     aita.paivita();
                 });
             } else {
                 // hahmo ei ole aidan takana, piirretään aidat ensin
+                // koska aidan piirtäminen riippuu pelaajan tiedoista, päivitetään pelaajan tiedot aina ensin
+                pelaaja.paivita();
                 aidat.forEach((aita) => {
                     aita.paivita();
                 });
-                pelaaja.paivita();
+                pelaaja.piirra();
             }
 
             /* piirretään lähin tausta, keltainen maa */
             taustat[4].piirra(pelaaja.nopeus.x);
+            
+            // pelaajan nopeuden määrittelyä
+            if (pelaaja.paikka.x > 2000 && pelaaja.nopeus.x == 3) pelaaja.nopeus.x = 5;
+            if (pelaaja.paikka.x > 20000 && pelaaja.nopeus.x == 5) pelaaja.nopeus.x = 3;
+            if (!pelaaja.hyppyKaynnissa && pelaaja.paikka.x > 20200 && pelaaja.nopeus.x == 3) {
+                pelaaja.nopeus.x = 0;
+                pelaaja.gameOver = true;
+                lopputeksti = 'Onneksi olkoon! Pääsit radan läpi pistemäärällä '+Math.round(pistemaara / 10);
+                tila = 'g';
+            }
 
             if (tila == 'a') {
                 // aloitusruudun piirtäminen
-                if (fontOK) {
+                //if (audioOK && musiikki.paused) musiikki.play();
+
+                if (fontOK && hennyOK && abelOK) {
                     ctx.fillStyle = 'rgb(233, 88, 4)';
-                    ctx.font = '32px "Rowdies"';
+                    ctx.font = '32px Rowdies';
                     ctx.textAlign = 'center';
                     var text = 'Terttu ja Mika'
                     var text2 = 'esittävät pelin'
                     var text3 = 'Mennään siitä mistä aita on matalin'
+
+                    // varjo
+                    ctx.shadowOffsetX = 3;
+                    ctx.shadowOffsetY = 3;
+                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                    ctx.shadowBlur = 4;
+
                     ctx.strokeStyle = 'black';  // Reunaviivan väri
                     ctx.lineWidth = 1.5;          // Reunaviivan leveys
                     ctx.strokeText(text, canvas.width / 2, 35);
@@ -796,19 +856,56 @@ function animoi(aika) {
                     ctx.lineWidth = 4; 
                     ctx.strokeText(text3, canvas.width / 2, 80+60);
                     ctx.fillText(text3, canvas.width / 2, 80+60)
-                    ctx.fillText('Mennään siitä mistä aita on matalin',canwidth / 2, 80+60);
+                    //ctx.fillText('Mennään siitä mistä aita on matalin',canwidth / 2, 80+60);
+
+                    ctx.font = 'bold 36px Abel';
+                    //ctx.strokeStyle = 'black';
+                    ctx.fillStyle = 'white';
+                    //ctx.lineWidth = 3;
+                    ctx.letterSpacing = '2px';
+                    // 230, 280, 330
+                    ctx.globalAlpha = haive[haivekohta[0]];
+                    //ctx.strokeText(alkutekstit[tekstinkohta][0],canwidth / 2, 230);
+                    ctx.fillText(alkutekstit[tekstinkohta][0],canwidth / 2, 230);
+                    ctx.globalAlpha = haive[haivekohta[1]];
+                    //ctx.strokeText(alkutekstit[tekstinkohta][1],canwidth / 2, 280);
+                    ctx.fillText(alkutekstit[tekstinkohta][1],canwidth / 2, 280);
+                    ctx.globalAlpha = haive[haivekohta[2]];
+                    //ctx.strokeText(alkutekstit[tekstinkohta][2],canwidth / 2, 330);
+                    ctx.fillText(alkutekstit[tekstinkohta][2],canwidth / 2, 330);
+                    ctx.globalAlpha = 1;
+
+                    ctx.letterSpacing = '0px';
+                    
+                    // varjo pois
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.shadowColor = 'rgba(0,0,0,0)';
+                    ctx.shadowBlur = 0;
+                    
+                    haivekohta.forEach((arvo, ndx) => {
+                        arvo = (arvo+1 == haive.length) ? 0 : arvo + 1;
+                        haivekohta[ndx] = arvo;
+                    })
+                    if (haivekohta[2] == 0) tekstinkohta = (tekstinkohta + 1 == alkutekstit.length) ? 0 : tekstinkohta + 1;
                 }
             } else
+            // pelitila
             if (tila == 'p') {
                 let luku = Math.round(pistemaara / 10), pmaara;
                 if (luku < 0) {
                     pistemaara = 0;
                     luku = 0;
-                    pelaaja.kaatuu = true;
-                    pelaaja.kuvarivi = 4;
-                    pelaaja.framelaskuri = 0;
-                    pelaaja.nykyinenFrame = 0;
-                    pelaaja.nopeus.x = 3;
+                    if (!pelaaja.kaatuu) {
+                        pelaaja.kaatuu = true;
+                        lopputeksti = 'Juoksit liian kauan aidan samalla puolella.';
+                        if (!pelaaja.hyppyKaynnissa) {
+                            pelaaja.kuvarivi = 4;
+                            pelaaja.framelaskuri = 0;
+                            pelaaja.nykyinenFrame = 0;
+                            pelaaja.nopeus.x = 3;
+                        }
+                    }
                 }
                 pmaara = luku.toString();
 
@@ -822,7 +919,34 @@ function animoi(aika) {
                 ctx.textAlign = 'left';
                 ctx.fillText(pmaara,canwidth / 2 - 44, 32);
 
-            } // end pelitila
+            } else // end pelitila
+            // Game over
+            if (tila == 'g') {
+                ctx.font = 'bold 36px Abel';
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.letterSpacing = '2px';
+                ctx.textAlign = 'center';
+                // varjo
+                ctx.shadowOffsetX = 3;
+                ctx.shadowOffsetY = 3;
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 4;
+
+                // 230, 280, 330
+                ctx.strokeText('Peli päättyi!',canwidth / 2, 230);
+                ctx.fillText('Peli päättyi!',canwidth / 2, 230);
+                ctx.strokeText(lopputeksti,canwidth / 2, 280);
+                ctx.fillText(lopputeksti,canwidth / 2, 280);
+                ctx.strokeText('Paina nuoli ylös tai w jatkaaksesi',canwidth / 2, 330);
+                ctx.fillText('Paina nuoli ylös tai w jatkaaksesi',canwidth / 2, 330);
+
+            } else
+            // ohjeet
+            if (tila == 'o') {
+
+            }
         }
     }
 }

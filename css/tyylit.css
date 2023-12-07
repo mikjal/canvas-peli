@@ -176,91 +176,257 @@ min-width 1200px	Monitors, Desktops
     transform-origin: 50% 0;
 }
 
-@media only screen and (max-width: 514.99px) {
+@media only screen and (orientation: portrait) {
+    @media only screen and (max-width: 514.99px) {
+        .skaalaus {
+            transform: scale(0.4);
+        }
+    }
+
+    @media only screen and (min-width: 515px) {
+        .skaalaus {
+            transform: scale(0.5);
+        }
+    
+    }
+
+    @media only screen and (min-width: 618px) {
+        .skaalaus {
+            transform: scale(0.6);
+        }
+    
+    }
+
+    @media only screen and (min-width: 721px) { 
+    
+        .skaalaus {
+            transform: scale(0.7);
+        }
+    }
+
+    @media only screen and (min-width: 824px) {
+        .skaalaus {
+            transform: scale(0.8);
+        }
+    }
+
+    @media only screen and (min-width: 927px) {
+        .skaalaus {
+            transform: scale(0.9);
+        }
+    }
+
+    @media only screen and (min-width: 1030px) {
+        .skaalaus {
+            transform: scale(1);
+        }
+    }
+
+    @media only screen and (min-width: 1133px) {
+        .skaalaus {
+            transform: scale(1.1);
+        }
+    }
+
+    @media only screen and (min-width: 1236px) {
+        .skaalaus {
+            transform: scale(1.2);
+        }
+    }
+
+    @media only screen and (min-width: 1339px) {
+        .skaalaus {
+            transform: scale(1.3);
+        }
+    }
+
+    @media only screen and (min-width: 1442px) {
+        .skaalaus {
+            transform: scale(1.4);
+        }
+    }
+
+    @media only screen and (min-width: 1545px) {
+        .skaalaus {
+            transform: scale(1.5);
+        }
+        
+    }
+        
+}
+
+@media only screen and (orientation: landscape) {
+    @media only screen and (max-height: 235.99px) {
+        .skaalaus {
+            transform: scale(0.4);
+        }
+    }
+
+    @media only screen and (min-height: 236px) {
+        .skaalaus {
+            transform: scale(0.4);
+        }
+    
+    }
+
+    @media only screen and (min-height: 295px) {
+        .skaalaus {
+            transform: scale(0.5);
+        }
+    
+    }
+
+    @media only screen and (min-height: 354px) {
+        .skaalaus {
+            transform: scale(0.6);
+        }
+    
+    }
+    
+    @media only screen and (min-height: 413px) { 
+    
+        .skaalaus {
+            transform: scale(0.7);
+        }
+    }
+
+    @media only screen and (min-height: 472px) {
+        .skaalaus {
+            transform: scale(0.8);
+        }
+    }
+
+    @media only screen and (min-height: 531px) {
+        .skaalaus {
+            transform: scale(0.9);
+        }
+    }
+
+    @media only screen and (min-height: 590px) {
+        .skaalaus {
+            transform: scale(1);
+        }
+    }
+
+    @media only screen and (min-height: 649px) {
+        .skaalaus {
+            transform: scale(1.1);
+        }
+    }
+
+    @media only screen and (min-height: 708px) {
+        .skaalaus {
+            transform: scale(1.2);
+        }
+    }
+
+    @media only screen and (min-height: 767px) {
+        .skaalaus {
+            transform: scale(1.3);
+        }
+    }
+
+    @media only screen and (min-height: 826px) {
+        .skaalaus {
+            transform: scale(1.4);
+        }
+        
+    }
+
+    @media only screen and (min-height: 885px) {
+        .skaalaus {
+            transform: scale(1.5);
+        }
+        
+    }
+            
+}
+
+/*
+@media only screen and (max-width: 514.99px) and (orientation: portrait), screen and (max-height: 235.99px) and (orientation: landscape) {
     .skaalaus {
         transform: scale(0.4);
-        /* transform-origin: 50% 0; */
     }
 }
 
-@media only screen and (min-width: 515px) {
+@media only screen and (min-width: 515px), screen and (min-height: 295px) {
     .skaalaus {
         transform: scale(0.5);
     }
 
 }
 
-@media only screen and (min-width: 618px) {
+@media only screen and (min-width: 618px), screen and (min-height: 354px) {
     .skaalaus {
         transform: scale(0.6);
     }
 
 }
 
-@media only screen and (min-width: 721px) {
+@media only screen and (min-width: 721px), screen and (min-height: 413px) { 
+    
     .skaalaus {
         transform: scale(0.7);
     }
-    
 }
 
-@media only screen and (min-width: 824px) {
+@media only screen and (min-width: 824px), screen and (min-height: 472px) {
     .skaalaus {
         transform: scale(0.8);
     }
-    
+
 }
 
-@media only screen and (min-width: 927px) {
+@media only screen and (min-width: 927px), screen and (min-height: 531px) {
     .skaalaus {
         transform: scale(0.9);
     }
     
 }
 
-@media only screen and (min-width: 1030px) {
+@media only screen and (min-width: 1030px), screen and (min-height: 590px) {
     .skaalaus {
         transform: scale(1);
     }
     
 }
 
-@media only screen and (min-width: 1133px) {
+@media only screen and (min-width: 1133px), screen and (min-height: 649px) {
     .skaalaus {
         transform: scale(1.1);
     }
     
 }
 
-@media only screen and (min-width: 1236px) {
+@media only screen and (min-width: 1236px), screen and (min-height: 708px) {
     .skaalaus {
         transform: scale(1.2);
     }
     
 }
 
-@media only screen and (min-width: 1339px) {
+@media only screen and (min-width: 1339px), screen and (min-height: 767px) {
     .skaalaus {
         transform: scale(1.3);
     }
     
 }
 
-@media only screen and (min-width: 1442px) {
+@media only screen and (min-width: 1442px), screen and (min-height: 826px) {
     .skaalaus {
         transform: scale(1.4);
     }
     
 }
 
-@media only screen and (min-width: 1545px) {
+@media only screen and (min-width: 1545px), screen and (min-height: 885px) {
     .skaalaus {
         transform: scale(1.5);
     }
     
 }
 
-
+*/
 
 /*
 @media only screen and (min-width: 1540px) {
