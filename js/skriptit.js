@@ -568,8 +568,8 @@ window.onload = () => {
         new Tausta(0,1418,1920,25,-canheight,1.1) // keltainen maa 
     ];
 
-    lintu2 = new Lintu(390, 1.5, 2); // musta lintu korkeus, koko, nopeus
-    lintu1 = new Lintu(370, 3, 4); // kauempana oleva lintu
+    lintu2 = new Lintu(390,2,4); // korkeus, koko, nopeus
+    lintu1 = new Lintu(370,4,1.4); // kauempi lintu
 
     window.addEventListener('keydown', (eve) => {
         painettu(eve.key);
@@ -635,57 +635,9 @@ class Tausta {
     }
 }
 // Arpoo satunnaisen kokonaisluvun väliltä min (mukaan lukien) ja max (mukaan lukien)
-function arvoSatunnainenLuku(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-console.log(arvoSatunnainenLuku, "arvoSatunnainenLuku")
-//musta lintu
-class Lintu2 {
-    constructor() {
-        this.animFrameja = 16; // Vaihda tason määrä
-        this.nykyinenFrame = 0;
-        this.leveys = lintuImg2.width / this.animFrameja;
-        this.korkeus = 390; // Pienennetty korkeus
-        this.paikka = {
-            x: -210,  // Aseta linnun alku sivun vasempaan reunaan
-            y: canheight - this.korkeus 
-        };
-        this.nopeus = {
-            x: 4,  // Aseta linnun vaakasuuntainen nopeus
-            y: 0
-        };
-    }
-
-    piirra() {
-        ctx.drawImage(lintuImg2,
-            this.nykyinenFrame * this.leveys, /* source x */
-            0, /* source y */
-            this.leveys,
-            this.korkeus,
-            this.paikka.x, /* destination x */
-            this.paikka.y, /* destination y */
-            this.leveys / 2,
-            this.korkeus / 2);
-        this.nykyinenFrame = (this.nykyinenFrame < this.animFrameja - 1) ? this.nykyinenFrame += 1 : 0;
-    }
-
-    paivita() {
-        // Vaakasuuntainen liike
-        this.paikka.x += this.nopeus.x;
-        // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
-        if (this.paikka.x + this.leveys > canwidth + 1000 + this.satunnainenLuku) { // lukua muuttamalla lintu pysyy näkymättömissä
-            this.paikka.x = -210;
-            console.log(this.satunnainenLuku, "luku")
-            this.generoiSatunnainenLuku();
-        }
-    }
-
-    generoiSatunnainenLuku() {
-        this.satunnainenLuku = arvoSatunnainenLuku(1, 1000);
-        console.log(this.satunnainenLuku, "Generoi");
-    } 
-}
-
+//function arvoSatunnainenLuku(min, max) {
+//    return Math.floor(Math.random() * (max - min + 1)) + min;
+//  }
 
 //musta lintu
 class Lintu {
@@ -705,6 +657,7 @@ class Lintu {
             x: this.nopeus,  // Aseta linnun vaakasuuntainen nopeus
             y: 0
         };
+        this.satunnainenLuku = 0;
     }
 
     piirra() {
@@ -726,21 +679,21 @@ class Lintu {
         // Tarkista, onko lintu mennyt näytön oikean reunan yli, ja aseta se näytön alkuun
         if (this.paikka.x + this.leveys > canwidth + 1000 + this.satunnainenLuku) { // lukua muuttamalla lintu pysyy näkymättömissä
             this.paikka.x = -210;
-            console.log(this.satunnainenLuku, "luku")
-            this.generoiSatunnainenLuku();
+            this.generoiSatunnainenLuku(200,1000);
+            console.log("luku:",this.satunnainenLuku);
         }
     }
 
-    generoiSatunnainenLuku() {
-        this.satunnainenLuku = arvoSatunnainenLuku(1, 500);
-        console.log(this.satunnainenLuku, "Generoi");
+    generoiSatunnainenLuku(min, max) {
+        this.satunnainenLuku = Math.floor(Math.random() * (max - min + 1)) + min;
+        //this.satunnainenLuku = arvoSatunnainenLuku(1, 500);
     } 
 }
 
 const alkutekstit = [
     // Aina kolmen rivin sarjoissa
     ['','Paina nuoli ylös tai w aloittaaksesi','Paina nuoli alas tai s vaihtaaksesi hahmoa'],
-    ['','Hahmografiikat / Character animation sprites','www.gameart2d.com'],
+    ['','Hahmojen animaatiot / Character animation sprites','www.gameart2d.com'],
     ['Taustagrafiikat / Background graphics','Mobile Game Graphics','www.opengameart.com'],
     ['Musiikki / Music','Digital Love by AlexiAction','www.pixabay.com']
 ];
