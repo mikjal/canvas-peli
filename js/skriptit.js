@@ -693,7 +693,7 @@ class Lintu {
 const alkutekstit = [
     // Aina kolmen rivin sarjoissa
     ['','Paina nuoli ylös tai w aloittaaksesi','Paina nuoli alas tai s vaihtaaksesi hahmoa'],
-    ['','Hahmojen animaatiot / Character animation sprites','www.gameart2d.com'],
+    ['Hahmojen animaatiot / Character animation sprites','','www.gameart2d.com'],
     ['Taustagrafiikat / Background graphics','Mobile Game Graphics','www.opengameart.com'],
     ['Musiikki / Music','Digital Love by AlexiAction','www.pixabay.com']
 ];
