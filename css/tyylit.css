@@ -16,57 +16,6 @@ body {
     padding: 0;
 }
 
-/*
-#odota {
-    display: none;
-    text-align: center;
-    position: fixed;
-    top: 22%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-
-#spin1 {
-    width: 40px;
-    height: 40px;
-    border-bottom: 4px solid black;
-    border-top: 4px solid black;
-    border-left: 4px solid lightgrey;
-    border-right: 4px solid lightgrey;
-    border-radius: 50%;
-    animation: pyoritys 1s linear infinite;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 20%;
-    left: 33%; 
-    transform: translate(-50%, -50%);
-}
-
-
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-h1 {
-    background-color: rgb(135, 206, 235);
-    border: 6px solid rgb(85, 114, 1);
-    color:rgb(92, 124, 211);
-    border-radius: 10px;
-    width: 350px;
-    height: 70px;
-    font-size: 40px;
-    text-align: center;
-    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-    box-shadow: 8px 8px rgb(147, 148, 148);
-}
-*/
-
 #odota {
     position: fixed;
     left: 50%;
@@ -144,29 +93,8 @@ h1 {
     padding: 0.2em 1em;
     margin-bottom: 0.5em;
 }
-/*
-Breakpoint Setting	For Device
-max-width 420px	Smaller devices
-max-width 600px	Phones
-min-width 600px	Tablets and Large Phones
-min-width 768px	Tablets
-min-width 992px	Laptops and Desktops
-min-width 1200px	Monitors, Desktops
 
-410+ 0,4
-512+ 0,5
-614+ 0,6
-717+ 0,7
-819+ 0,8
-922+ 0,9
-1024 1
-*/
 #kanvaasi {
-        /*
-        display: block; 
-        margin: auto;  
-        */
-        /* position: fixed; */
         border: 1px solid black;
         margin-top: 10px;
         opacity: 0;
@@ -331,110 +259,13 @@ min-width 1200px	Monitors, Desktops
         .skaalaus {
             transform: scale(1.4);
         }
-        
     }
 
     @media only screen and (min-height: 885px) {
         .skaalaus {
             transform: scale(1.5);
         }
-        
     }
             
 }
 
-/*
-@media only screen and (max-width: 514.99px) and (orientation: portrait), screen and (max-height: 235.99px) and (orientation: landscape) {
-    .skaalaus {
-        transform: scale(0.4);
-    }
-}
-
-@media only screen and (min-width: 515px), screen and (min-height: 295px) {
-    .skaalaus {
-        transform: scale(0.5);
-    }
-
-}
-
-@media only screen and (min-width: 618px), screen and (min-height: 354px) {
-    .skaalaus {
-        transform: scale(0.6);
-    }
-
-}
-
-@media only screen and (min-width: 721px), screen and (min-height: 413px) { 
-    
-    .skaalaus {
-        transform: scale(0.7);
-    }
-}
-
-@media only screen and (min-width: 824px), screen and (min-height: 472px) {
-    .skaalaus {
-        transform: scale(0.8);
-    }
-
-}
-
-@media only screen and (min-width: 927px), screen and (min-height: 531px) {
-    .skaalaus {
-        transform: scale(0.9);
-    }
-    
-}
-
-@media only screen and (min-width: 1030px), screen and (min-height: 590px) {
-    .skaalaus {
-        transform: scale(1);
-    }
-    
-}
-
-@media only screen and (min-width: 1133px), screen and (min-height: 649px) {
-    .skaalaus {
-        transform: scale(1.1);
-    }
-    
-}
-
-@media only screen and (min-width: 1236px), screen and (min-height: 708px) {
-    .skaalaus {
-        transform: scale(1.2);
-    }
-    
-}
-
-@media only screen and (min-width: 1339px), screen and (min-height: 767px) {
-    .skaalaus {
-        transform: scale(1.3);
-    }
-    
-}
-
-@media only screen and (min-width: 1442px), screen and (min-height: 826px) {
-    .skaalaus {
-        transform: scale(1.4);
-    }
-    
-}
-
-@media only screen and (min-width: 1545px), screen and (min-height: 885px) {
-    .skaalaus {
-        transform: scale(1.5);
-    }
-    
-}
-
-*/
-
-/*
-@media only screen and (min-width: 1540px) {
-    .skaalaus {
-        transform: scale(1.5);
-        transform-origin: 50% 0;
-    }
-}
-
-*/
