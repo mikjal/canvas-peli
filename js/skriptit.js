@@ -404,7 +404,7 @@ class Aita {
 
 // Pelin aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3 = tiiliaidan pääty
 // HUOM! alussa 3 kpl nollaa ja kakkosen jälkeen aina kolmonen että tiiliaita päättyy siististi
-const aitaelementit = [0,0,0,1,1,2,2,3,1,1,2,2,3,1,1,2,2,2,2,3,1,1,2,2,2,2,2,3,1,1,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,3,1,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,3,1,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,3,1,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3];
+const aitaelementit = [0,0,0,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,2,2,3,1,1,2,2,2,2,2,3,1,1,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,3,1,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,3,1,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,3,1,1,2,2,2,3,1,2,2,2,3,1,1,2,2,2,2,3,1,2,2,2,3,1,1,2,2,2,2,2,3,1,1,2,2,2,2,2,2,3,1,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,3];
 // Aita-elementtien levydet: ei aitaa = 220, puuaita = 142, tiiliaita = 220, tiiliaidan pääty = 29
 const elementtienLeveydet = [220, 142, 220, 29];
 // Aita-elementtien x-offset eli jos samaa elementtiä on monta kertaa peräkkäin, paljonko seuraava elementti menee edellisen päälle
@@ -592,7 +592,7 @@ window.onload = () => {
         new Tausta(0,0,1024,288,0,0),
         // negatiivinen kuvan sijoittumistieto (y-koordinaatti )tulkitaan siten, että siitä vähennetään kuvan korkeus
         // -canvas.height+25 = canvasin korkeus - kuvan korkeus - 25 (25 on viimeksi piirrettävän "taustan" korkeus)
-        new Tausta(0,288,1920,400,-canheight+25,0.2), //harmaat rakennukset
+        new Tausta(0,288,1920,400,-canheight+35,0.2), //harmaat rakennukset
         new Tausta(0,688,1920,420,-canheight+25,0.4), //muut rakennukset
         new Tausta(0,1108,1920,310,-canheight+25,0.6), //puut 
         new Tausta(0,1418,1920,25,-canheight,1.1) // keltainen maa 
