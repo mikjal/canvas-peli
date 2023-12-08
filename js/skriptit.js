@@ -508,6 +508,7 @@ function painettu(nappi) {
                     pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == true) ? true : false;
                 }
             break;
+            // cheat
             case 'c':
                 pistelisays = 50;
                 break;
@@ -914,14 +915,19 @@ function animoi(aika) {
                 ctx.textAlign = 'left';
                 ctx.font = '32px Arial';
                 ctx.fillStyle = (pistelisays > 0) ? 'green' : 'red';
-                ctx.fillText(pmaara,canwidth / 2 - 44 -100, 32);
+                ctx.fillText(pmaara,canwidth / 2 - 42, 32);
 
+                let edistyminen = Math.round(pelaaja.paikka.x / 30000 * canwidth);
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.fillRect(0, canheight-15, edistyminen, 15);
+                /*
                 let matka = Math.round(pelaaja.paikka.x / 50).toString();
                 while (matka.length < 3) {
                     matka = '0' + matka;
                 }
                 ctx.fillStyle = 'black';
                 ctx.fillText(matka+'m / 600m',canwidth / 2 - 44 +100, 32);
+                */
 
 
 
@@ -945,6 +951,17 @@ function animoi(aika) {
                 ctx.strokeText('Paina hyppynäppäintä jatkaaksesi',canwidth / 2, 330);
                 ctx.fillText('Paina hyppynäppäintä jatkaaksesi',canwidth / 2, 330);
                 varjo(false);
+
+                let edistyminen  = Math.round(pelaaja.paikka.x / 30000 * canwidth);
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.fillRect(0, canheight-20, edistyminen, 20);
+
+                let pros = Math.round(pelaaja.paikka.x / 300);
+
+                ctx.font = 'bold 18px Abel';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'black';
+                ctx.fillText(pros+'%', Math.round(edistyminen / 2) , canheight-4);
 
             } else
             // ohjeet
