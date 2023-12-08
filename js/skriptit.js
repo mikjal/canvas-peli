@@ -35,7 +35,7 @@ lintuImg2.onload = () =>{
 lintuImg2.onerror = function() {
     console.error('Virhe kuvaa ladattaessa:', lintuImg2.src);
 }
-lintuImg2.src = '../kuvat/mustatLinnut2.png';
+lintuImg2.src = 'kuvat/mustatLinnut2.png';
 
 let taustat = [], lintu1, lintu2 // taustakuvia varten
 
