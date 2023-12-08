@@ -21,6 +21,9 @@ musiikki.src = '../musiikki/digital-love-reduced-bitrate.mp3';
 // Taustakuvat
 const taustakuvat = new Image();
 taustakuvat.src = '../kuvat/taustat.png';
+taustakuvat.onerror = (err) => {
+    console.log(err);
+}
 
 // Ääninappulan kuvat
 const audioOnImage = new Image(), audioOffImage = new Image();
