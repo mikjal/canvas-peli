@@ -16,11 +16,11 @@ musiikki.oncanplaythrough = () => {
 }
 musiikki.autoplay = false;
 musiikki.loop = true;
-musiikki.src = '../musiikki/digital-rdcd.mp3';
+musiikki.src = 'musiikki/digital-rdcd.mp3';
 
 // Taustakuvat
 const taustakuvat = new Image();
-taustakuvat.src = '../kuvat/taustat.png';
+taustakuvat.src = 'kuvat/taustat.png';
 taustakuvat.onerror = (err) => {
     console.log(err);
 }
@@ -38,7 +38,7 @@ lintuImg2.onload = () =>{
 lintuImg2.onerror = function() {
     console.error('Virhe kuvaa ladattaessa:', lintuImg2.src);
 }
-lintuImg2.src = '../kuvat/linnut.png';
+lintuImg2.src = 'kuvat/linnut.png';
 
 let taustat = [], lintu1, lintu2 // taustakuvia varten
 
@@ -93,7 +93,7 @@ const haive = rakennaHaive();
 const hahmot = [
     // poika
     {
-        kuvatiedosto: '../kuvat/poika.png', // tiedostonimi
+        kuvatiedosto: 'kuvat/poika.png', // tiedostonimi
         animaatioFrameja: 15, // montako animaatioframea yhdellä kuvatiedoston rivillä (rivejä aina 5)
         xOffsetti: 50, // Hahmon säätäminen x-suunnassa
         yOffsetit: [2,0,0,0,2], // Hahmon säätäminen y-suunnassa eri animaatioissa (paikallaan, kävely, juoksu, hyppy, kaatuminen)
@@ -101,7 +101,7 @@ const hahmot = [
     },
     // kissa
     {
-        kuvatiedosto: '../kuvat/kissa.png',
+        kuvatiedosto: 'kuvat/kissa.png',
         animaatioFrameja: 10,
         xOffsetti: 0,
         yOffsetit: [18,16,16,14,4],
@@ -109,7 +109,7 @@ const hahmot = [
     },
     // dino
     {
-        kuvatiedosto: '../kuvat/dino.png',
+        kuvatiedosto: 'kuvat/dino.png',
         animaatioFrameja: 10,
         xOffsetti: 45,
         yOffsetit: [3,2,2,0,2],
@@ -117,7 +117,7 @@ const hahmot = [
     },
     // joulupukki
     {
-        kuvatiedosto: '../kuvat/joulupukki.png',
+        kuvatiedosto: 'kuvat/joulupukki.png',
         animaatioFrameja: 10,
         xOffsetti: 20,
         yOffsetit: [3,2,2,0,2],
