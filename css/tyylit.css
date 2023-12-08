@@ -111,7 +111,7 @@ h1 {
     position: absolute;
     left: 0;
     top: 0;
-    opacity: 0.5;
+    opacity: 0;
     height: 0;
     width: 100vw;
 }
@@ -175,6 +175,7 @@ min-width 1200px	Monitors, Desktops
 .skaalaus {
     transform-origin: 50% 0;
 }
+
 
 @media only screen and (orientation: portrait) {
     @media only screen and (max-width: 514.99px) {

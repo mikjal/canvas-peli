@@ -8,13 +8,14 @@ let pistemaara = 0, pistelisays = 50, painovoima = 0.5, hahmoid = 0;
 let tila = 'a'; // a = aloitusruutu, o = ohjeet, p = peli käynnissä, g = game over
 let touch = false; // tukeeko laite kosketusta?
 let aidat = []; // Aita-luokan oliot
-let hennyOK = false, abelOK = false, fontOK = false, audioOK = false, lopputeksti = '', naytaOhjeet = true, debug = false;
+let hennyOK = false, abelOK = false, fontOK = false, audioOK = false, lopputeksti = '', naytaOhjeet = true, debug = false, playAudio = false;
 const musiikki = new Audio();
 
 musiikki.oncanplaythrough = () => {
     audioOK = true;
 }
 musiikki.autoplay = false;
+musiikki.loop = true;
 musiikki.src = '../musiikki/digital-love-reduced-bitrate.mp3';
 
 // Taustakuvat
@@ -403,7 +404,7 @@ class Aita {
 
 // Pelin aidat, 0 = ei aitaa, 1 = puuaita, 2 = tiiliaita, 3 = tiiliaidan pääty
 // HUOM! alussa 3 kpl nollaa ja kakkosen jälkeen aina kolmonen että tiiliaita päättyy siististi
-const aitaelementit = [0,0,0,1,1,2,2,3,1,1,2,2,3,1,1,2,2,2,2,3,1,1,2,2,2,2,2,3,1,1,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,3,1,1,2,2,2,2,2,2,2,2,2,2,3,1,2,3,1,2,3,1,1]
+const aitaelementit = [0,0,0,1,1,2,2,3,1,1,2,2,3,1,1,2,2,2,2,3,1,1,2,2,2,2,2,3,1,1,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,3,1,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,3,1,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,1,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,3,1,2,2,2,2,2,2,3,1,1,2,2,2,2,2,2,2,3,1,2,2,2,2,2,2,2,2,2,2,3];
 // Aita-elementtien levydet: ei aitaa = 220, puuaita = 142, tiiliaita = 220, tiiliaidan pääty = 29
 const elementtienLeveydet = [220, 142, 220, 29];
 // Aita-elementtien x-offset eli jos samaa elementtiä on monta kertaa peräkkäin, paljonko seuraava elementti menee edellisen päälle
@@ -480,6 +481,7 @@ function painettu(nappi) {
                 tila = 'a';
                 pelaaja.nollaa();
                 tekstinkohta = 0;
+                haivekohta = [31,16,1];
                 break;
         }
     } else 
@@ -506,6 +508,9 @@ function painettu(nappi) {
                     pelaaja.vaihdetaanPuolta = (pelaaja.aidanTakana == true) ? true : false;
                 }
             break;
+            case 'c':
+                pistelisays = 50;
+                break;
         }
     
     }
@@ -537,9 +542,12 @@ function sallinapit() {
 
 }
 
+const audioOnImage = new Image(), audioOffImage = new Image();
+audioOnImage.src = 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320ZM400-606l-86 86H200v80h114l86 86v-252ZM300-480Z"/></svg>';
+audioOffImage.src = 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m616-320-56-56 104-104-104-104 56-56 104 104 104-104 56 56-104 104 104 104-56 56-104-104-104 104Zm-496-40v-240h160l200-200v640L280-360H120Zm280-246-86 86H200v80h114l86 86v-252ZM300-480Z"/></svg>';
 
 // == ONLOAD ===========================================================================================
-// Odotetaan että sivu ja kaikki sen resurssit on latautunut
+// Odotetaan että sivu ja kaikki sen resurssit ovat latautuneet
 window.onload = () => {
     document.getElementById('odota').style.display = 'none';
     document.getElementById('kanvaasi').style.opacity = 1;
@@ -550,10 +558,31 @@ window.onload = () => {
         touch = true;
         document.querySelector('#info').style.display = 'block';
         laskenappienpaikka();
+        playAudio = true;
+    } else {
+    // ei-kosketeltava laite
+        canvas.addEventListener('click', (evnt) => {
+            // vain aloitusruudussa
+            if (tila == 'a') {
+                // canvaksen koordinaatit ja mitat
+                let bcr = canvas.getBoundingClientRect();
+                // osuuko hiiren klikkaus vasemapaan alakulmaan?
+                if (((evnt.x - bcr.left) < (bcr.width * 0.047)) && ((bcr.height+bcr.top - evnt.y) < (bcr.height * 0.083))) {
+                    if (playAudio) { // soitto päällä
+                        musiikki.pause();
+                        playAudio = false;
+                    } else {
+                        musiikki.play();
+                        playAudio = true;
+                    }
+                }
+            }
+        })
+
     }
 
     //window.addEventListener('resize',laskenappienpaikka);
-    //screen.orientation.addEventListener('change', laskenappienpaikka);
+    if (touch) screen.orientation.addEventListener('change', laskenappienpaikka);
 
     // luodaan Tausta-luokan mukaiset oliot kaikille taustoille, piirretään järjestyksessä ensimmäisestä viimeiseen
     taustat = [
@@ -680,7 +709,7 @@ class Lintu {
         if (this.paikka.x + this.leveys > canwidth + 1000 + this.satunnainenLuku) { // lukua muuttamalla lintu pysyy näkymättömissä
             this.paikka.x = -210;
             this.generoiSatunnainenLuku(200,1000);
-            console.log("luku:",this.satunnainenLuku);
+            if (debug) console.log("luku:",this.satunnainenLuku);
         }
     }
 
@@ -697,7 +726,7 @@ const alkutekstit = [
     ['Taustagrafiikat / Background graphics','Mobile Game Graphics','www.opengameart.com'],
     ['Musiikki / Music','Digital Love by AlexiAction','www.pixabay.com'],
     ['Projektissa käytetyt ohjelmat','Visual Studio Code, Git, Adobe Photoshop,','Corel PaintShop Pro, Piskel, VLC Media Player'],
-    ['(C) 2023','Terttu Toivonen','Mika Jalkanen']
+    ['© 2023','Terttu Toivonen ja Mika Jalkanen','Tehty osana Esedun JavaScript-opintoja']
 ];
 let haivekohta = [31,16,1], tekstinkohta = 0;
 
@@ -775,21 +804,12 @@ function animoi(aika) {
             /* piirretään lähin tausta, keltainen maa */
             taustat[4].piirra(pelaaja.nopeus.x);
             
-            // pelaajan nopeuden määrittelyä
-            if (pelaaja.paikka.x > 2000 && pelaaja.nopeus.x == 3) pelaaja.nopeus.x = 4;
-            if (pelaaja.paikka.x > 2050 && pelaaja.nopeus.x == 4) pelaaja.nopeus.x = 5;
-            if (pelaaja.paikka.x > 30000 && pelaaja.nopeus.x == 5) pelaaja.nopeus.x = 4;
-            if (pelaaja.paikka.x > 30050 && pelaaja.nopeus.x == 4) pelaaja.nopeus.x = 3;
-            if (!pelaaja.hyppyKaynnissa && pelaaja.paikka.x > 30100 && pelaaja.nopeus.x == 3) {
-                pelaaja.nopeus.x = 0;
-                pelaaja.gameOver = true;
-                lopputeksti = 'Onneksi olkoon! Pääsit radan läpi pistemäärällä '+Math.round(pistemaara / 10);
-                tila = 'g';
-            }
+
+
 
             if (tila == 'a') {
                 // aloitusruudun piirtäminen
-                //if (audioOK && musiikki.paused) musiikki.play();
+                if (audioOK && musiikki.paused && playAudio) musiikki.play();
 
                 if (fontOK && hennyOK && abelOK) {
                     ctx.fillStyle = 'rgb(233, 88, 4)';
@@ -834,6 +854,18 @@ function animoi(aika) {
                     
                     varjo(false);
 
+
+                    if (!touch) {
+                        ctx.globalAlpha = 0.4;
+                        if (playAudio) {
+                            ctx.drawImage(audioOnImage, 0,0,24,24, 0, canheight-48,48,48);
+                        } else {
+                            ctx.drawImage(audioOffImage, 0,0,24,24, 0, canheight-48,48,48);
+                        }
+                        ctx.globalAlpha = 1;
+                        
+                    }
+
                     haivekohta.forEach((arvo, ndx) => {
                         arvo = (arvo+1 == haive.length) ? 0 : arvo + 1;
                         haivekohta[ndx] = arvo;
@@ -843,6 +875,19 @@ function animoi(aika) {
             } else
             // pelitila
             if (tila == 'p') {
+
+                // pelaajan nopeuden määrittelyä
+                if (pelaaja.paikka.x > 2000 && pelaaja.nopeus.x == 3) pelaaja.nopeus.x = 4;
+                if (pelaaja.paikka.x > 2050 && pelaaja.nopeus.x == 4) pelaaja.nopeus.x = 5;
+                if (pelaaja.paikka.x > 29800 && pelaaja.nopeus.x == 5) pelaaja.nopeus.x = 4;
+                if (pelaaja.paikka.x > 29900 && pelaaja.nopeus.x == 4) pelaaja.nopeus.x = 3;
+                if (!pelaaja.hyppyKaynnissa && pelaaja.paikka.x > 30000 && pelaaja.nopeus.x == 3) {
+                    pelaaja.nopeus.x = 0;
+                    pelaaja.gameOver = true;
+                    lopputeksti = 'Onneksi olkoon! Pääsit radan läpi pistemäärällä '+Math.round(pistemaara / 10);
+                    tila = 'g';
+                }
+
                 let luku = Math.round(pistemaara / 10), pmaara;
                 if (luku < 0) {
                     pistemaara = 0;
@@ -864,11 +909,21 @@ function animoi(aika) {
                     pmaara = '0' + pmaara;
                 }
 
-                ctx.fillStyle = (pistelisays > 0) ? 'green' : 'red';
-                ctx.font = '32px Arial';
+                
                 ctx.letterSpacing = '0px';
                 ctx.textAlign = 'left';
-                ctx.fillText(pmaara,canwidth / 2 - 44, 32);
+                ctx.font = '32px Arial';
+                ctx.fillStyle = (pistelisays > 0) ? 'green' : 'red';
+                ctx.fillText(pmaara,canwidth / 2 - 44 -100, 32);
+
+                let matka = Math.round(pelaaja.paikka.x / 50).toString();
+                while (matka.length < 3) {
+                    matka = '0' + matka;
+                }
+                ctx.fillStyle = 'black';
+                ctx.fillText(matka+'m / 600m',canwidth / 2 - 44 +100, 32);
+
+
 
             } else // end pelitila
             // Game over
