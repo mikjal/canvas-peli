@@ -16,7 +16,7 @@ musiikki.oncanplaythrough = () => {
 }
 musiikki.autoplay = false;
 musiikki.loop = true;
-musiikki.src = 'musiikki/digital-rdcd.mp3';
+musiikki.src = 'musiikki/digital_love-reduced_bitrate.mp3';
 
 // Taustakuvat
 const taustakuvat = new Image();
@@ -712,7 +712,7 @@ const alkutekstit = [
     // Aina kolmen rivin sarjoissa
     ['','Paina nuoli ylös tai w aloittaaksesi','Paina nuoli alas tai s vaihtaaksesi hahmoa'],
     ['Hahmojen animaatiot / Character animation sprites','','www.gameart2d.com'],
-    ['Taustagrafiikat / Background graphics','Mobile Game Graphics','www.opengameart.com'],
+    ['Taustagrafiikat / Background graphics','Mobile Game Graphics','www.opengameart.org'],
     ['Musiikki / Music','Digital Love by AlexiAction','www.pixabay.com'],
     ['Projektissa käytetyt ohjelmat','Visual Studio Code, Git, Adobe Photoshop,','Corel PaintShop Pro, Piskel, VLC Media Player'],
     ['© 2023','Terttu Toivonen ja Mika Jalkanen','Tehty osana Esedun JavaScript-opintoja']
